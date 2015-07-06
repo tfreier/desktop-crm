@@ -1,0 +1,10 @@
+target/
+.classpath
+.project
+.externalToolBuilders/
+.settings/
+org.eclipse.wst.jsdt.core.javascriptValidator.launch
+/bin
+.iml
+.idea/
+*.iml
