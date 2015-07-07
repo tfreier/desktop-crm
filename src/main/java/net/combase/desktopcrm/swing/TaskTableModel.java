@@ -5,25 +5,20 @@ package net.combase.desktopcrm.swing;
 
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.List;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
-import org.apache.commons.io.IOUtils;
+import net.combase.desktopcrm.data.CrmManager;
+import net.combase.desktopcrm.domain.Task;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
-
-import ch.swingfx.twinkle.NotificationBuilder;
-import net.combase.desktopcrm.data.CrmManager;
-import net.combase.desktopcrm.domain.Task;
 
 /**
  * @author "Till Freier"
@@ -44,33 +39,6 @@ public class TaskTableModel extends AbstractTableModel
 			JButton.class, JButton.class, JButton.class };
 
 	private final List<Task> data;
-
-	private static final ImageIcon rescheduleIcon;
-	private static final ImageIcon doneIcon;
-	private static final ImageIcon viewIcon;
-
-	static
-	{
-		Image ri = null, di = null, vi = null;
-		try
-		{
-			ri = new ImageIcon(
-				IOUtils.toByteArray(TaskTableModel.class.getResourceAsStream("/reschedule.png"))).getImage();
-			di = new ImageIcon(
-				IOUtils.toByteArray(TaskTableModel.class.getResourceAsStream("/done.png"))).getImage();
-			vi = new ImageIcon(
-				IOUtils.toByteArray(TaskTableModel.class.getResourceAsStream("/view.png"))).getImage();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		final int size = 20;
-		rescheduleIcon = new ImageIcon(ri.getScaledInstance(size, size, Image.SCALE_SMOOTH));
-		doneIcon = new ImageIcon(di.getScaledInstance(size, size, Image.SCALE_SMOOTH));
-		viewIcon = new ImageIcon(vi.getScaledInstance(size, size, Image.SCALE_SMOOTH));
-
-	}
 
 	public TaskTableModel(List<Task> data)
 	{
@@ -143,7 +111,7 @@ public class TaskTableModel extends AbstractTableModel
 		});
 
 
-		button.setIcon(doneIcon);
+		button.setIcon(CrmIcons.DONE);
 		if (task.getDue() != null && task.getDue().isBeforeNow())
 			button.setBackground(new Color(255, 0, 0, 100));
 		else if (task.getDue() != null && task.getDue().toLocalDate().isEqual(new LocalDate()))
@@ -166,7 +134,8 @@ public class TaskTableModel extends AbstractTableModel
 				RescheduleOption[] values = RescheduleOption.values();
 				int result = JOptionPane.showOptionDialog(JOptionPane.getFrameForComponent(button),
 					"Please select a reschedule option.", "Reschedule", JOptionPane.DEFAULT_OPTION,
-					JOptionPane.QUESTION_MESSAGE, rescheduleIcon, values, RescheduleOption.TOMORRW);
+					JOptionPane.QUESTION_MESSAGE, CrmIcons.RECHEDULE, values,
+					RescheduleOption.TOMORRW);
 
 				if (result < 0)
 					return;
@@ -208,7 +177,7 @@ public class TaskTableModel extends AbstractTableModel
 		});
 
 		button.setBackground(new Color(255, 175, 80, 100));
-		button.setIcon(rescheduleIcon);
+		button.setIcon(CrmIcons.RECHEDULE);
 		button.setToolTipText("Reschedule task...");
 
 		return button;
@@ -228,7 +197,7 @@ public class TaskTableModel extends AbstractTableModel
 
 
 		button.setBackground(new Color(90, 115, 255, 100));
-		button.setIcon(viewIcon);
+		button.setIcon(CrmIcons.VIEW);
 		button.setToolTipText("View task...");
 
 		return button;

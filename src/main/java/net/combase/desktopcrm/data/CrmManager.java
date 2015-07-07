@@ -12,6 +12,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.combase.desktopcrm.domain.AbstractCrmObject;
+import net.combase.desktopcrm.domain.Call;
+import net.combase.desktopcrm.domain.Lead;
+import net.combase.desktopcrm.domain.Opportunity;
+import net.combase.desktopcrm.domain.Settings;
+import net.combase.desktopcrm.domain.Task;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -21,12 +28,6 @@ import com.sugarcrm.api.SugarCredentials;
 import com.sugarcrm.api.SugarEntity;
 import com.sugarcrm.api.SugarSession;
 import com.sugarcrm.api.v4.impl.SugarApi;
-
-import net.combase.desktopcrm.domain.AbstractCrmObject;
-import net.combase.desktopcrm.domain.Call;
-import net.combase.desktopcrm.domain.Lead;
-import net.combase.desktopcrm.domain.Settings;
-import net.combase.desktopcrm.domain.Task;
 
 /**
  * @author till
@@ -208,6 +209,39 @@ public class CrmManager
 		
 		Collection<Lead> collection = loadCrmObjects(creator, moduleName, query);
 		
+		return new ArrayList<>(collection);
+	}
+
+	public static List<Opportunity> getOpportunityList()
+	{
+		if (!checkSetup())
+			return new ArrayList<>();
+
+		final CrmObjectCreator<Opportunity> creator = new CrmObjectCreator<Opportunity>()
+		{
+
+			@Override
+			public Opportunity createObject(String id, String title)
+			{
+				return new Opportunity(id, title);
+			}
+
+			@Override
+			public void prepare(Opportunity obj, SugarEntity bean)
+			{
+			}
+
+
+		};
+
+		String moduleName = "Opportunities";
+		String userId = session.getUser().getUserId(); // "a2e0e9a3-4d63-a56b-315b-546a4cdf41a8";//
+		String query = "opportunities.sales_stage not like 'Closed%' and opportunities.sales_stage not like 'closed%'" +
+			" and opportunities.assigned_user_id='" + userId + "'";
+
+
+		Collection<Opportunity> collection = loadCrmObjects(creator, moduleName, query);
+
 		return new ArrayList<>(collection);
 	}
 
