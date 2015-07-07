@@ -4,13 +4,11 @@
 package net.combase.desktopcrm.swing;
 
 import java.awt.Color;
-import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -18,12 +16,14 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
-import net.combase.desktopcrm.data.CrmManager;
-import net.combase.desktopcrm.domain.Task;
-
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
+
+import ch.swingfx.twinkle.NotificationBuilder;
+import net.combase.desktopcrm.data.CrmManager;
+import net.combase.desktopcrm.domain.Task;
 
 /**
  * @author "Till Freier"
@@ -102,7 +102,6 @@ public class TaskTableModel extends AbstractTableModel
 	@Override
 	public Object getValueAt(final int rowIndex, final int columnIndex)
 	{
-
 		/* Adding components */
 		Task task = data.get(rowIndex);
 		switch (columnIndex)
@@ -113,7 +112,7 @@ public class TaskTableModel extends AbstractTableModel
 				if (task.getDue() == null)
 					return "";
 
-				return task.getDue().toString("E MM/dd/yy HH:MM");
+				return task.getDue().minusHours(4).toDateTime(DateTimeZone.getDefault()).toString("E MM/dd/yy HH:mm");
 			case 2 :
 				return createViewButton(task);
 			case 3 :
@@ -129,7 +128,7 @@ public class TaskTableModel extends AbstractTableModel
 	/**
 	 * @return
 	 */
-	private JButton createDoneButton(Task task)
+	private JButton createDoneButton(final Task task)
 	{
 		final JButton button = new JButton();
 		button.addActionListener(new ActionListener()
@@ -137,8 +136,9 @@ public class TaskTableModel extends AbstractTableModel
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
-				JOptionPane.showMessageDialog(JOptionPane.getFrameForComponent(button),
-					"Button clicked for row ");
+				CrmManager.completeTask(task);
+				data.remove(task);
+				fireTableDataChanged();
 			}
 		});
 
@@ -222,22 +222,7 @@ public class TaskTableModel extends AbstractTableModel
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
-				try
-				{
-					Desktop.getDesktop().browse(new URI(task.getViewUrl()));
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-					try
-					{
-						Runtime.getRuntime().exec("google-chrome " + task.getViewUrl());
-					}
-					catch (IOException e1)
-					{
-						e1.printStackTrace();
-					}
-				}
+				DesktopUtil.openBrowser(task.getViewUrl());
 			}
 		});
 

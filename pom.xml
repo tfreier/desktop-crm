@@ -5,6 +5,12 @@
 	<artifactId>desktop-crm</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Desktop CRM</name>
+	<repositories>
+		<repository>
+			<id>aparsons-github</id>
+			<url>https://github.com/aparsons/maven-repository/raw/master</url>
+		</repository>
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>com.seaglasslookandfeel</groupId>
@@ -47,6 +53,11 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.8.1</version>
 		</dependency>
+		<dependency>
+			<groupId>ch.swingfx</groupId>
+			<artifactId>twinkle</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -55,8 +66,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 		</plugins>
