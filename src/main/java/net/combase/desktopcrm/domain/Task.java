@@ -3,37 +3,29 @@
  */
 package net.combase.desktopcrm.domain;
 
+import org.joda.time.DateTime;
+
 /**
  * @author till
  *
  */
-public class Task {
-	private String id;
-	private String title;
-	
-	
-	
-	public Task(String id, String title) {
-		super();
-		this.id = id;
-		this.title = title;
+public class Task extends AbstractCrmObject
+{
+	private DateTime due;
+
+
+	public DateTime getDue()
+	{
+		return due;
 	}
-	public String getId() {
-		return id;
+
+	public void setDue(DateTime due)
+	{
+		this.due = due;
 	}
-	public void setId(String id) {
-		this.id = id;
+
+	public Task(String id, String title)
+	{
+		super(id, title);
 	}
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	@Override
-	public String toString() {
-		return getTitle();
-	}
-	
-	
 }

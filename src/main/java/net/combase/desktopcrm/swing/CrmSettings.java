@@ -6,11 +6,13 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import net.combase.desktopcrm.data.CrmManager;
 import net.combase.desktopcrm.data.DataStoreManager;
 import net.combase.desktopcrm.domain.Settings;
 
@@ -67,6 +69,7 @@ public class CrmSettings extends JFrame {
 		
 		JButton btnSave = new JButton("save");
 		btnSave.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				onSave();
 			}
@@ -95,6 +98,9 @@ public class CrmSettings extends JFrame {
 		
 		DataStoreManager.writeSettings(settings);
 		
-		setVisible(false);
+		if (!CrmManager.setup())
+			JOptionPane.showMessageDialog(this, "The CRM connection failed!");
+		else
+			setVisible(false);
 	}
 }

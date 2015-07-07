@@ -1,14 +1,14 @@
 package net.combase.desktopcrm.swing;
 
+import java.awt.BorderLayout;
+import java.util.List;
+
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.combase.desktopcrm.data.CrmManager;
 import net.combase.desktopcrm.domain.Task;
-
-import java.awt.BorderLayout;
-import java.util.List;
 
 public class TaskPanel extends JPanel {
 

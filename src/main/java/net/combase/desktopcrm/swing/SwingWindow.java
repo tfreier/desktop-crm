@@ -1,18 +1,14 @@
 package net.combase.desktopcrm.swing;
 
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
-import javax.swing.JMenuBar;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.UIManager;
-
-import com.seaglasslookandfeel.SeaGlassLookAndFeel;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.BorderLayout;
 
 public class SwingWindow {
 
@@ -25,8 +21,8 @@ public class SwingWindow {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					SeaGlassLookAndFeel laf = new SeaGlassLookAndFeel();
-					UIManager.setLookAndFeel(laf);
+					// SeaGlassLookAndFeel laf = new SeaGlassLookAndFeel();
+					// UIManager.setLookAndFeel(laf);
 				} catch (Exception e) {
 				    e.printStackTrace();
 				}
@@ -74,7 +70,7 @@ public class SwingWindow {
 		mnSettings.add(mntmNotifications);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
-		frame.getContentPane().add(new TaskPanel());
+		frame.getContentPane().add(new TaskTablePanel());
 	}
 
 }
