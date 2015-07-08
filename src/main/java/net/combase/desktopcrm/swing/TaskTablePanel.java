@@ -77,8 +77,8 @@ public class TaskTablePanel extends JPanel
 			}
 		});
 
-		table.getColumnModel().getColumn(1).setMaxWidth(130);
-		table.getColumnModel().getColumn(1).setMinWidth(130);
+		table.getColumnModel().getColumn(1).setMaxWidth(140);
+		table.getColumnModel().getColumn(1).setMinWidth(140);
 		table.getColumnModel().getColumn(2).setMaxWidth(30);
 		table.getColumnModel().getColumn(3).setMaxWidth(30);
 		table.getColumnModel().getColumn(4).setMaxWidth(30);

@@ -24,12 +24,13 @@ public final class CrmHelper
 		List<AbstractCrmObject> checkList = new ArrayList<>();
 		checkList.addAll(CrmManager.getLeadList());
 		checkList.addAll(CrmManager.getOpportunityList());
+
 		for (final AbstractCrmObject lead : checkList)
 		{
 			if (!hasActionsPlanned(lead))
 				result.add(lead);
 		}
-
+		System.out.println("found " + result.size() + " action items.");
 		return result;
 	}
 
@@ -37,7 +38,7 @@ public final class CrmHelper
 	 * @param lead
 	 * @return
 	 */
-	private static boolean hasActionsPlanned(final AbstractCrmObject lead)
+	public static boolean hasActionsPlanned(final AbstractCrmObject lead)
 	{
 		boolean noAction = CrmManager.getTaskListByParent(lead.getId()).isEmpty();
 

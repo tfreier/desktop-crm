@@ -10,6 +10,8 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.UIManager;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import net.combase.desktopcrm.data.CrmHelper;
 import net.combase.desktopcrm.data.CrmManager;
@@ -32,6 +34,7 @@ public class SwingWindow
 			List<AbstractCrmObject> leadList = CrmHelper.getActionObjects();
 			for (final AbstractCrmObject lead : leadList)
 			{
+				System.out.println("request action item for " + lead.getTitle());
 				String msg = lead.getTitle() +
 					" has no planned actions. Click here to schedule a task.";
 
@@ -39,6 +42,7 @@ public class SwingWindow
 				nb.withTitle("Plan Follow Up Action");
 				nb.withMessage(msg);
 				nb.withIcon(CrmIcons.WARN);
+				nb.withDisplayTime(60000);
 
 				nb.withListener(new NotificationEventAdapter()
 				{
@@ -132,8 +136,8 @@ public class SwingWindow
 			{
 				try
 				{
-					// SeaGlassLookAndFeel laf = new SeaGlassLookAndFeel();
-					// UIManager.setLookAndFeel(laf);
+					NimbusLookAndFeel laf = new NimbusLookAndFeel();
+					UIManager.setLookAndFeel(laf);
 				}
 				catch (Exception e)
 				{

@@ -20,6 +20,10 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
+import ch.swingfx.twinkle.event.NotificationEvent;
+import ch.swingfx.twinkle.event.NotificationEventAdapter;
+import ch.swingfx.twinkle.window.Positions;
+
 /**
  * @author "Till Freier"
  *
@@ -30,6 +34,7 @@ public class TaskTableModel extends AbstractTableModel
 	{
 		LATER, TOMORRW, NEXT_WEEK
 	}
+
 	/**
 	 * 
 	 */
@@ -40,10 +45,56 @@ public class TaskTableModel extends AbstractTableModel
 
 	private final List<Task> data;
 
+	private final Runnable taskReminder = new Runnable()
+	{
+
+		@Override
+		public void run()
+		{
+			System.out.println("check task reminder...");
+			for (Task t : data)
+			{
+				if (t.getDue() == null)
+					continue;
+				if (t.getDue().isAfterNow() && t.getDue().isBefore(new DateTime().plusMinutes(15)))
+				{
+					System.out.println("remind user about task: " + t.getTitle());
+					DesktopUtil.createNotificationBuilder()
+						.withTitle("Task is due")
+						.withMessage(t.getTitle())
+						.withPosition(Positions.CENTER)
+						.withIcon(CrmIcons.RECHEDULE)
+						.withListener(new NotificationEventAdapter()
+						{
+							@Override
+							public void clicked(NotificationEvent event)
+							{
+
+							}
+						})
+						.showNotification();
+				}
+			}
+			// wait 5 minutes
+			try
+			{
+				Thread.sleep(300000);
+			}
+			catch (InterruptedException e1)
+			{
+				e1.printStackTrace();
+			}
+
+			taskReminder.run();
+		}
+	};
+
 	public TaskTableModel(List<Task> data)
 	{
 		super();
 		this.data = data;
+
+		new Thread(taskReminder).start();
 	}
 
 	public void update(List<Task> tasks)
@@ -80,7 +131,9 @@ public class TaskTableModel extends AbstractTableModel
 				if (task.getDue() == null)
 					return "";
 
-				return task.getDue().minusHours(4).toDateTime(DateTimeZone.getDefault()).toString("E MM/dd/yy HH:mm");
+				return task.getDue()
+					.toDateTime(DateTimeZone.getDefault())
+					.toString("E MM/dd/yy HH:mm");
 			case 2 :
 				return createViewButton(task);
 			case 3 :

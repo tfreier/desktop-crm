@@ -297,6 +297,104 @@ public class SugarApi
 
 	}
 
+	public class GetRelationshipRequest
+	{
+
+		protected String session;
+
+		@SerializedName("module_name")
+		protected String moduleName;
+
+		@SerializedName("module_id")
+		protected String moduleId;
+
+		@SerializedName("link_field_name")
+		protected String linkFieldName;
+
+		@SerializedName("related_module_query")
+		protected String relatedModuleQuery;
+
+
+		@SerializedName("related_fields")
+		protected ArrayList<String> relatedFields;
+
+
+		public GetRelationshipRequest(final String session)
+		{
+			this.session = session;
+		}
+
+
+		public String getRelatedModuleQuery()
+		{
+			return relatedModuleQuery;
+		}
+
+
+		public void setRelatedModuleQuery(String relatedModuleQuery)
+		{
+			this.relatedModuleQuery = relatedModuleQuery;
+		}
+
+
+		public ArrayList<String> getRelatedFields()
+		{
+			return relatedFields;
+		}
+
+
+		public void setRelatedFields(ArrayList<String> relatedFields)
+		{
+			this.relatedFields = relatedFields;
+		}
+
+
+		public String getLinkFieldName()
+		{
+			return this.linkFieldName;
+		}
+
+
+		public String getModuleId()
+		{
+			return this.moduleId;
+		}
+
+
+		public String getModuleName()
+		{
+			return this.moduleName;
+		}
+
+		public String getSession()
+		{
+			return this.session;
+		}
+
+
+		public void setLinkFieldName(final String linkFieldName)
+		{
+			this.linkFieldName = linkFieldName;
+		}
+
+
+		public void setModuleId(final String moduleId)
+		{
+			this.moduleId = moduleId;
+		}
+
+
+		public void setModuleName(final String moduleName)
+		{
+			this.moduleName = moduleName;
+		}
+
+		public void setSession(final String session)
+		{
+			this.session = session;
+		}
+
+	}
 
 	public class SugarLoginRequest
 	{
@@ -455,9 +553,11 @@ public class SugarApi
 		rd.close();
 
 		conn.disconnect();
-
-		System.out.println(sb.toString());
-		System.out.println();
+		if (System.getenv("sugardebug") != null)
+		{
+			System.out.println(sb.toString());
+			System.out.println();
+		}
 		return sb.toString();
 	}
 
@@ -615,4 +715,69 @@ public class SugarApi
 		}
 	}
 
+	public List<SugarEntity> getRelationsships(final SugarSession session, final String moduleOne,
+		final String moduleOneId, final String moduleTwo, final String query)
+		throws SugarApiException
+	{
+		final String sessionId = session.getSessionID();
+		final GetRelationshipRequest req = new GetRelationshipRequest(sessionId);
+
+		req.setModuleName(moduleOne);
+		req.setModuleId(moduleOneId);
+		req.setLinkFieldName(moduleTwo);
+		req.setRelatedModuleQuery(query);
+		req.setRelatedFields(new ArrayList<>(Arrays.asList("id")));
+
+		String response = null;
+		try
+		{
+			final String jsonData = this.json.toJson(req);
+			if (System.getenv("sugardebug") != null)
+			{
+				System.out.println(jsonData);
+			}
+
+			response = postToSugar(this.REST_ENDPOINT,
+				"method=get_relationships&response_type=JSON&input_type=JSON&rest_data=" +
+					this.codec.encode(jsonData));
+
+			if (System.getenv("sugardebug") != null)
+			{
+				System.out.println("response:");
+				System.out.println(response);
+			}
+
+			final GetEntryListResponse entryResp = this.json.fromJson(response,
+				GetEntryListResponse.class);
+			final SugarBeanReference[] entryList = entryResp.getEntryList();
+			if (entryList == null)
+			{
+				final ErrorResponse error = this.json.fromJson(response, ErrorResponse.class);
+				final SugarApiException ex = new SugarApiException(error.getName());
+				ex.setDescription(error.getDescription());
+				ex.setNumber(error.getNumber());
+				throw ex;
+			}
+
+			final List<SugarEntity> result = new ArrayList<SugarEntity>(entryList.length);
+			for (final SugarBeanReference ref : entryList)
+			{
+				result.add(getBean(session, ref.getModuleName(), ref.getId()));
+			}
+
+			return result;
+		}
+		catch (final EncoderException e)
+		{
+			e.printStackTrace();
+			throw new SugarApiException("Could not fetch bean.", e);
+		}
+		catch (final Exception e)
+		{
+			e.printStackTrace();
+			throw new SugarApiException("Could not fetch bean.", e);
+		}
+
+
+	}
 }

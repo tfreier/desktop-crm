@@ -9,6 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
@@ -26,6 +27,8 @@ public class CrmSettings extends JFrame {
 	private JTextField sugarUrl;
 	private JTextField login;
 	private JPasswordField password;
+	private JSpinner spinner;
+	private JTextField accountCriteria;
 
 
 	/**
@@ -33,7 +36,7 @@ public class CrmSettings extends JFrame {
 	 */
 	public CrmSettings() {
 		setTitle("CRM Settings");
-		setBounds(100, 100, 449, 198);
+		setBounds(100, 100, 449, 264);
 		setResizable(false);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -74,7 +77,7 @@ public class CrmSettings extends JFrame {
 				onSave();
 			}
 		});
-		btnSave.setBounds(301, 128, 117, 25);
+		btnSave.setBounds(301, 184, 117, 25);
 		contentPane.add(btnSave);
 		
 
@@ -82,6 +85,27 @@ public class CrmSettings extends JFrame {
 		sugarUrl.setText(settings.getCrmUrl());
 		login.setText(settings.getUser());
 		password.setText(settings.getPassword());
+
+		JLabel lblGmtOffset = new JLabel("GMT Offset");
+		lblGmtOffset.setBounds(15, 118, 104, 15);
+		contentPane.add(lblGmtOffset);
+
+
+		spinner = new JSpinner();
+		spinner.setBounds(139, 116, 279, 25);
+		spinner.setValue(settings.getGmtOffset());
+
+		contentPane.add(spinner);
+
+		JLabel lblAccountFilter = new JLabel("Account Filter");
+		lblAccountFilter.setBounds(15, 150, 104, 15);
+		contentPane.add(lblAccountFilter);
+
+		accountCriteria = new JTextField();
+		accountCriteria.setBounds(139, 148, 279, 25);
+		contentPane.add(accountCriteria);
+		accountCriteria.setColumns(10);
+		accountCriteria.setText(settings.getAccountCriteria());
 	}
 
 
@@ -89,12 +113,16 @@ public class CrmSettings extends JFrame {
 	{
 		String url = sugarUrl.getText();
 		String user = login.getText();
+		String accountCrit = accountCriteria.getText();
 		String pwd = String.valueOf(password.getPassword());
+		int offset = (int)spinner.getValue();
 		
 		Settings settings = DataStoreManager.getSettings();
 		settings.setCrmUrl(url);
 		settings.setUser(user);
 		settings.setPassword(pwd);
+		settings.setGmtOffset(offset);
+		settings.setAccountCriteria(accountCrit);
 		
 		DataStoreManager.writeSettings(settings);
 		
