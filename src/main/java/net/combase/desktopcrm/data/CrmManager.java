@@ -13,8 +13,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.combase.desktopcrm.domain.AbstractCrmObject;
-import net.combase.desktopcrm.domain.Account;
 import net.combase.desktopcrm.domain.Call;
+import net.combase.desktopcrm.domain.Case;
 import net.combase.desktopcrm.domain.Lead;
 import net.combase.desktopcrm.domain.Opportunity;
 import net.combase.desktopcrm.domain.Settings;
@@ -63,6 +63,20 @@ public class CrmManager
 
 
 	};
+	public static final CrmObjectCreator<Case> CASE_CREATOR = new CrmObjectCreator<Case>()
+	{
+
+		@Override
+		public Case createObject(String id, String title)
+		{
+			return new Case(id, title);
+		}
+
+		@Override
+		public void prepare(Case obj, SugarEntity bean)
+		{
+		}
+	};
 	public static final CrmObjectCreator<Call> CALL_CREATOR = new CrmObjectCreator<Call>()
 		{
 
@@ -105,7 +119,6 @@ public class CrmManager
 	private static int gmtOffset = 0;
 	private static final DateTimeFormatter formatter = DateTimeFormat.forPattern(
 		"yyyy-MM-dd HH:mm:ss").withZoneUTC();
-	private static String accountCriteria;
 
 
 	public static synchronized boolean setup()
@@ -114,7 +127,6 @@ public class CrmManager
 		gmtOffset = settings.getGmtOffset();
 		sugarUrl = settings.getCrmUrl();
 		api = new SugarApi(sugarUrl);
-		accountCriteria = settings.getAccountCriteria();
 		try
 		{
 			session = api.getSugarSession(new SugarCredentials(settings.getUser(),
@@ -252,39 +264,23 @@ public class CrmManager
 		return new ArrayList<>(collection);
 	}
 
-	public static List<Account> getAccountList()
+	public static List<Case> getCaseList()
 	{
 		if (!checkSetup())
 			return new ArrayList<>();
 
-		final CrmObjectCreator<Account> creator = new CrmObjectCreator<Account>()
-		{
 
-			@Override
-			public Account createObject(String id, String title)
-			{
-				return new Account(id, title);
-			}
-
-			@Override
-			public void prepare(Account obj, SugarEntity bean)
-			{
-			}
-
-
-		};
-
-		String moduleName = "Accounts";
+		String moduleName = "Cases";
 		String userId = session.getUser().getUserId(); // "a2e0e9a3-4d63-a56b-315b-546a4cdf41a8";//
-		String query = "accounts.assigned_user_id='" + userId + "'";
-		if (accountCriteria != null && !accountCriteria.trim().isEmpty())
-			query += " and " + accountCriteria;
+		String query = "cases.state<>'Closed' and cases.state<>'closed'" +
+			" and cases.assigned_user_id='" + userId + "'";
 
 
-		Collection<Account> collection = loadCrmObjects(creator, moduleName, query);
+		Collection<Case> collection = loadCrmObjects(CASE_CREATOR, moduleName, query);
 
 		return new ArrayList<>(collection);
 	}
+
 
 	public static List<Opportunity> getOpportunityList()
 	{

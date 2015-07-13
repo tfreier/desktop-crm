@@ -22,11 +22,13 @@ public final class CrmHelper
 	{
 		List<AbstractCrmObject> result = new ArrayList<>();
 		List<AbstractCrmObject> checkList = new ArrayList<>();
+		checkList.addAll(CrmManager.getCaseList());
 		checkList.addAll(CrmManager.getLeadList());
 		checkList.addAll(CrmManager.getOpportunityList());
 
 		for (final AbstractCrmObject lead : checkList)
 		{
+			System.out.println("check " + lead.getTitle() + " for actions.");
 			if (!hasActionsPlanned(lead))
 				result.add(lead);
 		}

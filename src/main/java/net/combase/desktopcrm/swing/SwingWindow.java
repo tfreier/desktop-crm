@@ -35,8 +35,8 @@ public class SwingWindow
 			for (final AbstractCrmObject lead : leadList)
 			{
 				System.out.println("request action item for " + lead.getTitle());
-				String msg = lead.getTitle() +
-					" has no planned actions. Click here to schedule a task.";
+				String msg = "'" + lead.getTitle() +
+					"' has no planned actions. Click here to schedule a task.";
 
 				NotificationBuilder nb = DesktopUtil.createNotificationBuilder();
 				nb.withTitle("Plan Follow Up Action");
@@ -55,10 +55,10 @@ public class SwingWindow
 
 				nb.showNotification();
 
-				// wait 5 minutes
+				// wait 2 minutes
 				try
 				{
-					Thread.sleep(300000);
+					Thread.sleep(180000);
 				}
 				catch (InterruptedException e1)
 				{
