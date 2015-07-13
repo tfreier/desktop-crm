@@ -16,13 +16,7 @@ This project provides a simple desktop application that makes working with your 
 - Follow up reminders for cases, opportunities and leads
 
 
-## Build how to 
+## Releases 
 
-### 1. Download source code
-https://github.com/tfreier/desktop-crm/archive/master.zip
-
-### 2. Build application
-mvn package
-
-### 3. Run application
-java -jar target/desktop-crm-*-jar-with-dependencies.jar
+### 1.0 ALPHA-1
+https://github.com/tfreier/desktop-crm/releases/tag/1.0-ALPHA1
