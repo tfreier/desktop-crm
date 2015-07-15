@@ -196,8 +196,10 @@ public class TaskTableModel extends AbstractTableModel
 				RescheduleOption value = values[result];
 
 				DateTime due = task.getDue();
-				if (due == null)
+
+				if (due == null || due.isBeforeNow())
 					due = new DateTime();
+
 				switch (value)
 				{
 					case LATER :

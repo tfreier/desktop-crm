@@ -199,6 +199,8 @@ public class SwingWindow
 
 		frame.getContentPane().add(new TaskTablePanel());
 
+		frame.setIconImage(CrmIcons.USER.getImage());
+
 		new Thread(actionRequiredCheckRunner).start();
 		new Thread(callCheckRunner).start();
 	}
