@@ -28,7 +28,6 @@ public class CrmSettings extends JFrame {
 	private JTextField login;
 	private JPasswordField password;
 	private JSpinner spinner;
-	private JTextField accountCriteria;
 
 
 	/**
@@ -96,16 +95,6 @@ public class CrmSettings extends JFrame {
 		spinner.setValue(settings.getGmtOffset());
 
 		contentPane.add(spinner);
-
-		JLabel lblAccountFilter = new JLabel("Account Filter");
-		lblAccountFilter.setBounds(15, 150, 104, 15);
-		contentPane.add(lblAccountFilter);
-
-		accountCriteria = new JTextField();
-		accountCriteria.setBounds(139, 148, 279, 25);
-		contentPane.add(accountCriteria);
-		accountCriteria.setColumns(10);
-		accountCriteria.setText(settings.getAccountCriteria());
 	}
 
 
@@ -113,7 +102,6 @@ public class CrmSettings extends JFrame {
 	{
 		String url = sugarUrl.getText();
 		String user = login.getText();
-		String accountCrit = accountCriteria.getText();
 		String pwd = String.valueOf(password.getPassword());
 		int offset = (int)spinner.getValue();
 		
@@ -122,7 +110,6 @@ public class CrmSettings extends JFrame {
 		settings.setUser(user);
 		settings.setPassword(pwd);
 		settings.setGmtOffset(offset);
-		settings.setAccountCriteria(accountCrit);
 		
 		DataStoreManager.writeSettings(settings);
 		

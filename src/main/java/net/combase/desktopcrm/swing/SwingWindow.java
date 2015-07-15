@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
@@ -100,7 +101,12 @@ public class SwingWindow
 
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
-		frame.getContentPane().add(new TaskTablePanel());
+		JTabbedPane tabbedPane = new JTabbedPane();
+
+		tabbedPane.addTab("Tasks", CrmIcons.DONE, new TaskTablePanel());
+		tabbedPane.addTab("Calls", CrmIcons.CALL, new CallTablePanel());
+
+		frame.getContentPane().add(tabbedPane);
 
 		frame.setIconImage(CrmIcons.USER.getImage());
 

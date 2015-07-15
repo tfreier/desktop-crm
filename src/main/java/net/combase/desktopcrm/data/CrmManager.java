@@ -413,5 +413,85 @@ public class CrmManager
 		}
 	}
 
+	public static void rescheduleCall(Call call, DateTime start)
+	{
+		try
+		{
+			SugarEntity bean = api.getBean(session, "Calls", call.getId());
+
+			StringBuilder sb = new StringBuilder(bean.get("description"));
+			sb.append("\r\n");
+			sb.append("\r\n");
+			String newDueStr = start.toDateTime(DateTimeZone.getDefault()).toString(
+				"yyyy-MM-dd hh:mm");
+			String oldDueStr = formatter.parseDateTime(bean.get("date_start"))
+				.plusHours(gmtOffset)
+				.toDateTime(DateTimeZone.getDefault())
+				.toString("yyyy-MM-dd hh:mm");
+			sb.append("Rescheduled from ").append(oldDueStr).append(" to ").append(newDueStr);
+			bean.set("date_start", formatter.print(start.minusHours(gmtOffset)));
+			bean.set("description", sb.toString());
+
+
+			api.setBean(session, bean);
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public static void heldCall(Call call)
+	{
+		try
+		{
+			SugarEntity bean = api.getBean(session, "Calls", call.getId());
+
+			bean.set("status", "Held");
+
+			api.setBean(session, bean);
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public static List<Call> getCallList()
+	{
+		checkSetup();
+
+		final Set<Call> set = new TreeSet<>(new Comparator<Call>()
+		{
+
+			@Override
+			public int compare(Call o1, Call o2)
+			{
+				if (o1.getId().equals(o2.getId()))
+					return 0;
+				if (o1.getStart() != null && o2.getStart() != null)
+					return o1.getStart().compareTo(o2.getStart());
+
+				if (o2.getStart() == null)
+					return -1;
+
+				return 1;
+			}
+		});
+
+		String moduleName = "Calls";
+		String userId = session.getUser().getUserId(); // "a2e0e9a3-4d63-a56b-315b-546a4cdf41a8";//
+		String query = "calls.status='Planned' and calls.date_start>'2000-01-01' and calls.assigned_user_id='" +
+			userId + "'";
+
+
+		Collection<Call> collection = loadCrmObjects(CALL_CREATOR, moduleName, query);
+		set.addAll(collection);
+
+		return new ArrayList<>(set);
+	}
+
 
 }
