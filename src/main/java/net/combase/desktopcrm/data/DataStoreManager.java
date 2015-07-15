@@ -22,6 +22,9 @@ import net.combase.desktopcrm.domain.Settings;
  *
  */
 public class DataStoreManager {
+
+	private static Settings settings;
+
 	private static DataStore load() throws JAXBException, FileNotFoundException
 	{
 		File f = getStoreFile();
@@ -50,8 +53,10 @@ public class DataStoreManager {
 	
 	public static Settings getSettings()
 	{
+		if (settings != null)
+			return settings;
 		try {
-			return load().getSettings();
+			return settings = load().getSettings();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -65,6 +70,7 @@ public class DataStoreManager {
 			DataStore load = load();
 			load.setSettings(s);
 			write(load);
+			settings = s;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

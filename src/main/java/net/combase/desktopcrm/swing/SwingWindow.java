@@ -15,6 +15,7 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import net.combase.desktopcrm.data.CrmHelper;
 import net.combase.desktopcrm.data.CrmManager;
+import net.combase.desktopcrm.data.DataStoreManager;
 import net.combase.desktopcrm.domain.AbstractCrmObject;
 import net.combase.desktopcrm.domain.Call;
 import ch.swingfx.twinkle.NotificationBuilder;
@@ -78,6 +79,7 @@ public class SwingWindow
 			actionRequiredCheckRunner.run();
 		}
 	};
+
 	private static final Runnable callCheckRunner = new Runnable()
 	{
 
@@ -85,27 +87,31 @@ public class SwingWindow
 		public void run()
 		{
 			System.out.println("Check for calls...");
-			final Call c = CrmManager.getUpcomingCall();
-			if (c != null)
+
+			if (DataStoreManager.getSettings().isCallReminder())
 			{
-				String msg = "You have an upcoming call: " + c.getTitle();
-
-				NotificationBuilder nb = DesktopUtil.createNotificationBuilder();
-				nb.withTitle("Upcoming Call");
-				nb.withMessage(msg);
-				nb.withIcon(CrmIcons.CALL);
-				nb.withDisplayTime(30000);
-
-				nb.withListener(new NotificationEventAdapter()
+				final Call c = CrmManager.getUpcomingCall();
+				if (c != null)
 				{
-					@Override
-					public void clicked(NotificationEvent event)
-					{
-						DesktopUtil.openBrowser(c.getViewUrl());
-					}
-				});
+					String msg = "You have an upcoming call: " + c.getTitle();
 
-				nb.showNotification();
+					NotificationBuilder nb = DesktopUtil.createNotificationBuilder();
+					nb.withTitle("Upcoming Call");
+					nb.withMessage(msg);
+					nb.withIcon(CrmIcons.CALL);
+					nb.withDisplayTime(30000);
+
+					nb.withListener(new NotificationEventAdapter()
+					{
+						@Override
+						public void clicked(NotificationEvent event)
+						{
+							DesktopUtil.openBrowser(c.getViewUrl());
+						}
+					});
+
+					nb.showNotification();
+				}
 			}
 			// wait 2 minutes
 			try
@@ -193,8 +199,18 @@ public class SwingWindow
 		});
 		mnSettings.add(mntmCrmSetup);
 
-		JMenuItem mntmNotifications = new JMenuItem("Notifications");
-		mnSettings.add(mntmNotifications);
+		JMenuItem mntmNotificationSetup = new JMenuItem("Notifications");
+		mntmNotificationSetup.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				NotificationSettings s = new NotificationSettings();
+				s.setVisible(true);
+			}
+		});
+		mnSettings.add(mntmNotificationSetup);
+
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
 		frame.getContentPane().add(new TaskTablePanel());

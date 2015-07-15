@@ -6,7 +6,7 @@ package net.combase.desktopcrm.domain;
 import java.io.Serializable;
 
 /**
- * @author till
+ * @author Till Freier
  *
  */
 public class Settings implements Serializable
@@ -21,6 +21,62 @@ public class Settings implements Serializable
 	private int gmtOffset = 0;
 	private String accountCriteria;
 
+	private boolean callReminder = true;
+	private boolean taskReminder = true;
+	private boolean leadReminder = true;
+	private boolean opportunityReminder = true;
+	private boolean caseReminder = true;
+
+
+	public boolean isCallReminder()
+	{
+		return callReminder;
+	}
+
+	public void setCallReminder(boolean callReminder)
+	{
+		this.callReminder = callReminder;
+	}
+
+	public boolean isTaskReminder()
+	{
+		return taskReminder;
+	}
+
+	public void setTaskReminder(boolean taskReminder)
+	{
+		this.taskReminder = taskReminder;
+	}
+
+	public boolean isLeadReminder()
+	{
+		return leadReminder;
+	}
+
+	public void setLeadReminder(boolean leadReminder)
+	{
+		this.leadReminder = leadReminder;
+	}
+
+	public boolean isOpportunityReminder()
+	{
+		return opportunityReminder;
+	}
+
+	public void setOpportunityReminder(boolean opportunityReminder)
+	{
+		this.opportunityReminder = opportunityReminder;
+	}
+
+	public boolean isCaseReminder()
+	{
+		return caseReminder;
+	}
+
+	public void setCaseReminder(boolean caseReminder)
+	{
+		this.caseReminder = caseReminder;
+	}
 
 	public String getAccountCriteria()
 	{

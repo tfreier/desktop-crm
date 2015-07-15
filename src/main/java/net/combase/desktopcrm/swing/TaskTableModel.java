@@ -4,7 +4,6 @@
 package net.combase.desktopcrm.swing;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -14,6 +13,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 import net.combase.desktopcrm.data.CrmManager;
+import net.combase.desktopcrm.data.DataStoreManager;
 import net.combase.desktopcrm.domain.Task;
 
 import org.joda.time.DateTime;
@@ -52,29 +52,31 @@ public class TaskTableModel extends AbstractTableModel
 		public void run()
 		{
 			System.out.println("check task reminder...");
-			for (Task t : data)
-			{
-				if (t.getDue() == null)
-					continue;
-				if (t.getDue().isAfterNow() && t.getDue().isBefore(new DateTime().plusMinutes(15)))
+			if (DataStoreManager.getSettings().isTaskReminder())
+				for (Task t : data)
 				{
-					System.out.println("remind user about task: " + t.getTitle());
-					DesktopUtil.createNotificationBuilder()
-						.withTitle("Task is due")
-						.withMessage(t.getTitle())
-						.withPosition(Positions.CENTER)
-						.withIcon(CrmIcons.RECHEDULE)
-						.withListener(new NotificationEventAdapter()
-						{
-							@Override
-							public void clicked(NotificationEvent event)
+					if (t.getDue() == null)
+						continue;
+					if (t.getDue().isAfterNow() &&
+						t.getDue().isBefore(new DateTime().plusMinutes(15)))
+					{
+						System.out.println("remind user about task: " + t.getTitle());
+						DesktopUtil.createNotificationBuilder()
+							.withTitle("Task is due")
+							.withMessage(t.getTitle())
+							.withPosition(Positions.CENTER)
+							.withIcon(CrmIcons.RECHEDULE)
+							.withListener(new NotificationEventAdapter()
 							{
+								@Override
+								public void clicked(NotificationEvent event)
+								{
 
-							}
-						})
-						.showNotification();
+								}
+							})
+							.showNotification();
+					}
 				}
-			}
 			// wait 5 minutes
 			try
 			{
@@ -217,17 +219,8 @@ public class TaskTableModel extends AbstractTableModel
 
 				task.setDue(due);
 
-				EventQueue.invokeLater(new Runnable()
-				{
-
-					@Override
-					public void run()
-					{
-						CrmManager.rescheduleTask(task, task.getDue());
-						fireTableDataChanged();
-					}
-				});
-
+				CrmManager.rescheduleTask(task, task.getDue());
+				fireTableDataChanged();
 			}
 		});
 

@@ -2,20 +2,17 @@ package net.combase.desktopcrm.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.Timer;
 import javax.swing.table.TableCellRenderer;
 
 import net.combase.desktopcrm.data.CrmManager;
@@ -88,27 +85,17 @@ public class TaskTablePanel extends JPanel
 		add(new JScrollPane(table), BorderLayout.CENTER);
 
 
-		Timer t = new Timer(120000, new ActionListener()
+		java.util.Timer t = new java.util.Timer(true);
+		t.schedule(new TimerTask()
 		{
 			@Override
-			public void actionPerformed(ActionEvent e)
+			public void run()
 			{
-				EventQueue.invokeLater(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						List<Task> updatedList = CrmManager.getTaskList();
-						System.out.println(updatedList);
-						model.update(updatedList);
-					}
-				});
+				List<Task> updatedList = CrmManager.getTaskList();
+				System.out.println(updatedList);
+				model.update(updatedList);
 			}
-		});
-		t.setRepeats(true);
-		t.setInitialDelay(0);
-		t.start();
-
+		}, 500, 120000);
 	}
 
 }

@@ -22,9 +22,15 @@ public final class CrmHelper
 	{
 		List<AbstractCrmObject> result = new ArrayList<>();
 		List<AbstractCrmObject> checkList = new ArrayList<>();
-		checkList.addAll(CrmManager.getCaseList());
-		checkList.addAll(CrmManager.getLeadList());
-		checkList.addAll(CrmManager.getOpportunityList());
+
+		if (DataStoreManager.getSettings().isCaseReminder())
+			checkList.addAll(CrmManager.getCaseList());
+
+		if (DataStoreManager.getSettings().isLeadReminder())
+			checkList.addAll(CrmManager.getLeadList());
+
+		if (DataStoreManager.getSettings().isOpportunityReminder())
+			checkList.addAll(CrmManager.getOpportunityList());
 
 		for (final AbstractCrmObject lead : checkList)
 		{
