@@ -11,10 +11,16 @@ This project provides a simple desktop application that makes working with your 
 
 - Call notifications
 - Task list
+- Call list
 - Simple task reschedule
+- Simple call reschedule
 - Task due notification
 - Follow up reminders for cases, opportunities and leads
 
+## Planned Feature
+
+- Open e-mail templates with external e-mail client
+- Push to call
 
 ## Releases 
 
