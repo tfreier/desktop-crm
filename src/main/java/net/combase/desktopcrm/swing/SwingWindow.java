@@ -75,6 +75,9 @@ public class SwingWindow
 		JMenu mnSettings = new JMenu("Settings");
 		menuBar.add(mnSettings);
 
+		JMenu mnHelp = new JMenu("Help");
+		menuBar.add(mnHelp);
+
 		JMenuItem mntmCrmSetup = new JMenuItem("CRM Setup");
 		mntmCrmSetup.addActionListener(new ActionListener()
 		{
@@ -98,6 +101,19 @@ public class SwingWindow
 			}
 		});
 		mnSettings.add(mntmNotificationSetup);
+
+		JMenuItem mntmAbout = new JMenuItem("About");
+		mntmAbout.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				About s = new About();
+				s.setVisible(true);
+			}
+		});
+		mnHelp.add(mntmAbout);
+
 
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
