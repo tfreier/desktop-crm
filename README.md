@@ -24,5 +24,8 @@ This project provides a simple desktop application that makes working with your 
 
 ## Releases 
 
-### 1.0 ALPHA-1
-https://github.com/tfreier/desktop-crm/releases/tag/1.0-ALPHA1
+https://github.com/tfreier/desktop-crm/releases
+
+## Contributions
+
+Please contribute to the project by reporting issues and/or submitting pull requests. 
