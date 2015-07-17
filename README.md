@@ -26,6 +26,11 @@ This project provides a simple desktop application that makes working with your 
 
 https://github.com/tfreier/desktop-crm/releases
 
+## Requirements
+
+Java >=1.8  http://www.java.com/
+
+
 ## Contributions
 
 Please contribute to the project by reporting issues and/or submitting pull requests. 
