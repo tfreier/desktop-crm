@@ -26,7 +26,7 @@ public class SugarClient
 
 	public List<SugarEntity> findBeans(final SugarSession session, final String moduleName, final String query, final int offset, final int limit) throws SugarApiException
 	{
-		return this.sugar.getFindBeans(session, moduleName, query, offset, limit);
+		return this.sugar.getFindBeans(session, moduleName, query, offset, limit, null);
 	}
 
 

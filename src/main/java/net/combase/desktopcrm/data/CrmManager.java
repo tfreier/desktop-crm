@@ -159,15 +159,21 @@ public class CrmManager
 			@Override
 			public int compare(Task o1, Task o2)
 			{
-				if (o1.getId().equals(o2.getId()))
-					return 0;
-				if (o1.getDue() != null && o2.getDue() != null)
-					return o1.getDue().compareTo(o2.getDue());
+				int ret = 0;
 
-				if (o2.getDue() == null)
+				if (o1.getDue() != null && o2.getDue() != null)
+					ret = o1.getDue().compareTo(o2.getDue());
+
+				if (ret != 0)
+					return ret;
+
+				if (o1.getDue() == null && o2.getDue() != null)
+					return 1;
+
+				if (o1.getDue() != null && o2.getDue() == null)
 					return -1;
 
-				return 1;
+				return o1.getId().compareTo(o2.getId());
 			}
 		};
 
@@ -189,7 +195,8 @@ public class CrmManager
 		String moduleName = "Tasks";
 		String query = "tasks.status<>'Completed' and tasks.parent_id='" + parentId + "'";
 
-		Collection<Task> collection = loadCrmObjects(TASK_CREATOR, moduleName, query);
+		Collection<Task> collection = loadCrmObjects(TASK_CREATOR, moduleName, query,
+			"tasks.date_due");
 
 		return new ArrayList<>(collection);
 	}
@@ -325,6 +332,12 @@ public class CrmManager
 	private static <T extends AbstractCrmObject> Collection<T> loadCrmObjects(
 		final CrmObjectCreator<T> creator, String moduleName, String query)
 	{
+		return loadCrmObjects(creator, moduleName, query, null);
+	}
+
+	private static <T extends AbstractCrmObject> Collection<T> loadCrmObjects(
+		final CrmObjectCreator<T> creator, String moduleName, String query, String orderBy)
+	{
 
 		if (!checkSetup())
 			return new ArrayList<>();
@@ -332,7 +345,15 @@ public class CrmManager
 		try
 		{
 			System.out.println(query);
-			final List<SugarEntity> beans = api.getFindBeans(session, moduleName, query, 0, 100);
+			final List<SugarEntity> beans = new ArrayList<>();
+			List<SugarEntity> page;
+			do
+			{
+				page = api.getFindBeans(session, moduleName, query, beans.size(), 20,
+				orderBy);
+				beans.addAll(page);
+			}
+			while (page.size() == 20);
 
 			return convertEntityList(creator, moduleName, beans);
 		}

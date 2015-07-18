@@ -41,7 +41,7 @@ public class SugarApi
 		protected String query;
 
 		@SerializedName("order_by")
-		protected String orderBy;
+		protected String orderBy = "";
 
 		protected int offset = 0;
 
@@ -460,18 +460,24 @@ public class SugarApi
 	}
 
 
-	public List<SugarEntity> getFindBeans(final SugarSession session, final String moduleName, final String query, final int offset, final int limit) throws SugarApiException
+	public List<SugarEntity> getFindBeans(final SugarSession session, final String moduleName,
+		final String query, final int offset, final int limit, final String orderBy)
+		throws SugarApiException
 	{
 		final String sessionId = session.getSessionID();
 		final GetEntryListRequest req = new GetEntryListRequest(sessionId, moduleName);
 		req.setQuery(query);
 		req.setMaxResults(limit);
 		req.setOffset(offset);
+		if (orderBy != null)
+			req.setOrderBy(orderBy);
 
 		String response = null;
 		try
 		{
-			response = postToSugar(this.REST_ENDPOINT + "?method=get_entry_list&response_type=JSON&input_type=JSON&rest_data=" + this.codec.encode(this.json.toJson(req)));
+			String jsonStr = this.json.toJson(req);
+			System.out.println(jsonStr);
+			response = postToSugar(this.REST_ENDPOINT + "?method=get_entry_list&response_type=JSON&input_type=JSON&rest_data=" + this.codec.encode(jsonStr));
 		}
 		catch (final EncoderException e)
 		{
@@ -528,6 +534,7 @@ public class SugarApi
 
 	public String postToSugar(final String urlStr) throws Exception
 	{
+		System.out.println(urlStr);
 		final URL url = new URL(urlStr);
 		final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("POST");
@@ -553,11 +560,9 @@ public class SugarApi
 		rd.close();
 
 		conn.disconnect();
-		if (System.getenv("sugardebug") != null)
-		{
-			System.out.println(sb.toString());
-			System.out.println();
-		}
+		System.out.println(sb.toString());
+		System.out.println();
+
 		return sb.toString();
 	}
 
