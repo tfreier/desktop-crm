@@ -490,15 +490,21 @@ public class CrmManager
 			@Override
 			public int compare(Call o1, Call o2)
 			{
-				if (o1.getId().equals(o2.getId()))
-					return 0;
-				if (o1.getStart() != null && o2.getStart() != null)
-					return o1.getStart().compareTo(o2.getStart());
+				int ret = 0;
 
-				if (o2.getStart() == null)
+				if (o1.getStart() != null && o2.getStart() != null)
+					ret = o1.getStart().compareTo(o2.getStart());
+
+				if (ret != 0)
+					return ret;
+
+				if (o1.getStart() == null && o2.getStart() != null)
+					return 1;
+
+				if (o1.getStart() != null && o2.getStart() == null)
 					return -1;
 
-				return 1;
+				return o1.getId().compareTo(o2.getId());
 			}
 		});
 
