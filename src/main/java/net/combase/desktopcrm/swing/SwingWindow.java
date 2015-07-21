@@ -135,11 +135,11 @@ public class SwingWindow
 			public void windowClosing(WindowEvent we)
 			{
 				String ObjButtons[] = { "Yes", "No" };
-				int PromptResult = JOptionPane.showOptionDialog(null,
+				int PromptResult = JOptionPane.showOptionDialog(
+					frame,
 					"Are you sure you want to exit? You will no longer receive CRM notification if this window is closed.",
-					"CRM Notifications",
-					JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, ObjButtons,
-					ObjButtons[1]);
+					"CRM Notifications", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+					CrmIcons.WARN, ObjButtons, ObjButtons[1]);
 				if (PromptResult == 0)
 				{
 					System.exit(0);

@@ -47,6 +47,7 @@ public class About extends JFrame
 	public About()
 	{
 		setBounds(100, 100, 500, 350);
+		setIconImage(CrmIcons.MAIL.getImage());
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);

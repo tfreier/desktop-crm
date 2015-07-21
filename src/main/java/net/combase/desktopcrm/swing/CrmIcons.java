@@ -23,6 +23,9 @@ public final class CrmIcons
 	public static final ImageIcon RECHEDULE = loadImage("/reschedule.png");
 	public static final ImageIcon WARN = loadImage("/warning.png");
 	public static final ImageIcon MAIL = loadImage("/mail.png");
+	public static final ImageIcon TALK = loadImage("/talk.png");
+	public static final ImageIcon SETTINGS = loadImage("/settings.png");
+	public static final ImageIcon BELL = loadImage("/bell.png");
 
 	private CrmIcons()
 	{

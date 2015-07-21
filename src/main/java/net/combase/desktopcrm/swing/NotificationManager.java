@@ -55,7 +55,7 @@ public class NotificationManager
 					NotificationBuilder nb = DesktopUtil.createNotificationBuilder();
 					nb.withTitle("Plan Follow Up Action");
 					nb.withMessage(msg);
-					nb.withIcon(CrmIcons.WARN);
+					nb.withIcon(CrmIcons.TALK);
 					nb.withDisplayTime(60000);
 
 					nb.withListener(new NotificationEventAdapter()

@@ -37,6 +37,7 @@ public class CrmSettings extends JFrame {
 		setTitle("CRM Settings");
 		setBounds(100, 100, 449, 264);
 		setResizable(false);
+		setIconImage(CrmIcons.SETTINGS.getImage());
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
