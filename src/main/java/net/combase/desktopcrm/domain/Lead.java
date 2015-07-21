@@ -4,12 +4,15 @@
 package net.combase.desktopcrm.domain;
 
 /**
- * @author till
+ * 
+ * @author "Till Freier"
  *
  */
-public class Lead extends AbstractCrmObject {
+public class Lead extends AbstractCrmObject
+{
 
-	public Lead(String id, String title) {
+	public Lead(String id, String title)
+	{
 		super(id, title);
 	}
 

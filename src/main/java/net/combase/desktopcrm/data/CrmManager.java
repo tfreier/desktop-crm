@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import net.combase.desktopcrm.domain.AbstractCrmObject;
 import net.combase.desktopcrm.domain.Call;
 import net.combase.desktopcrm.domain.Case;
+import net.combase.desktopcrm.domain.Contact;
 import net.combase.desktopcrm.domain.Lead;
 import net.combase.desktopcrm.domain.Opportunity;
 import net.combase.desktopcrm.domain.Settings;
@@ -75,6 +76,7 @@ public class CrmManager
 		@Override
 		public void prepare(Case obj, SugarEntity bean)
 		{
+			obj.setNumber(bean.get("case_number"));
 		}
 	};
 	public static final CrmObjectCreator<Call> CALL_CREATOR = new CrmObjectCreator<Call>()
@@ -107,6 +109,24 @@ public class CrmManager
 		@Override
 		public void prepare(Opportunity obj, SugarEntity bean)
 		{
+		}
+
+
+	};
+
+	public static final CrmObjectCreator<Contact> CONTACT_CREATOR = new CrmObjectCreator<Contact>()
+	{
+
+		@Override
+		public Contact createObject(String id, String title)
+		{
+			return new Contact(id, title);
+		}
+
+		@Override
+		public void prepare(Contact obj, SugarEntity bean)
+		{
+			obj.setEmail(bean.get("email1"));
 		}
 
 
@@ -326,7 +346,28 @@ public class CrmManager
 
 
 		return new ArrayList<>();
+	}
 
+	public static Collection<Contact> getContactListByCase(String caseId)
+	{
+		if (!checkSetup())
+			return new ArrayList<>();
+
+		try
+		{
+			List<SugarEntity> result = api.getRelationsships(session, "Cases", caseId, "contacts",
+				"");
+
+			return convertEntityList(CONTACT_CREATOR, "Contacts", result);
+		}
+		catch (SugarApiException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		return new ArrayList<>();
 	}
 
 	private static <T extends AbstractCrmObject> Collection<T> loadCrmObjects(
