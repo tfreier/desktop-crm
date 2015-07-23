@@ -4,9 +4,13 @@
 package net.combase.desktopcrm.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 
 import net.combase.desktopcrm.domain.AbstractCrmObject;
+import net.combase.desktopcrm.domain.EmailTemplate;
 
 /**
  * @author "Till Freier"
@@ -16,6 +20,35 @@ public final class CrmHelper
 {
 	private CrmHelper()
 	{
+	}
+
+	private static Collection<EmailTemplate> emailTemplateCache = null;
+
+
+	public static synchronized void updateEmailTemplateCache()
+	{
+		emailTemplateCache = new TreeSet<>(new Comparator<EmailTemplate>()
+		{
+
+			@Override
+			public int compare(EmailTemplate o1, EmailTemplate o2)
+			{
+				return o1.getTitle().compareTo(o2.getTitle());
+			}
+		});
+
+		emailTemplateCache.addAll(CrmManager.getEmailTemplateList());
+	}
+
+
+	public static synchronized Collection<EmailTemplate> getCachedEmailTemplates()
+	{
+		if (emailTemplateCache == null)
+		{
+			updateEmailTemplateCache();
+		}
+
+		return emailTemplateCache;
 	}
 
 	public static List<AbstractCrmObject> getActionObjects()

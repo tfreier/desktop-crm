@@ -67,7 +67,7 @@ public class SwingWindow
 	private void initialize()
 	{
 		frame = new JFrame("Sugar CRM");
-		frame.setBounds(100, 100, 600, 500);
+		frame.setBounds(100, 100, 800, 500);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
 		JMenuBar menuBar = new JMenuBar();
@@ -123,6 +123,7 @@ public class SwingWindow
 		tabbedPane.addTab("Tasks", CrmIcons.DONE, new TaskTablePanel());
 		tabbedPane.addTab("Calls", CrmIcons.CALL, new CallTablePanel());
 		tabbedPane.addTab("Cases", CrmIcons.WARN, new CaseTablePanel());
+		tabbedPane.addTab("E-Mail Templates", CrmIcons.MAIL, new EmailTemplateTablePanel());
 
 		frame.getContentPane().add(tabbedPane);
 

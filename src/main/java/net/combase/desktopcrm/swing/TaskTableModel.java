@@ -6,6 +6,8 @@ package net.combase.desktopcrm.swing;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -14,6 +16,10 @@ import javax.swing.table.AbstractTableModel;
 
 import net.combase.desktopcrm.data.CrmManager;
 import net.combase.desktopcrm.data.DataStoreManager;
+import net.combase.desktopcrm.domain.Case;
+import net.combase.desktopcrm.domain.Contact;
+import net.combase.desktopcrm.domain.HasEmail;
+import net.combase.desktopcrm.domain.Lead;
 import net.combase.desktopcrm.domain.Task;
 
 import org.joda.time.DateTime;
@@ -39,11 +45,13 @@ public class TaskTableModel extends AbstractTableModel
 	 * 
 	 */
 	private static final long serialVersionUID = -3890791456083674319L;
-	private static final String[] COLUMN_NAMES = new String[] { "Task", "Due", "", "", "" };
+	private static final String[] COLUMN_NAMES = new String[] { "Task", "Due", "", "", "", "", "" };
 	private static final Class<?>[] COLUMN_TYPES = new Class<?>[] { String.class, String.class,
-			JButton.class, JButton.class, JButton.class };
+			JButton.class, JButton.class, JButton.class, JButton.class, JButton.class };
 
 	private final List<Task> data;
+
+	private static final int ALPHA = 10;
 
 	private final Runnable taskReminder = new Runnable()
 	{
@@ -137,10 +145,14 @@ public class TaskTableModel extends AbstractTableModel
 					.toDateTime(DateTimeZone.getDefault())
 					.toString("E MM/dd/yy HH:mm");
 			case 2 :
-				return createViewButton(task);
+				return createViewRelationButton(task);
 			case 3 :
-				return createRescheduleButton(task);
+				return createViewButton(task);
 			case 4 :
+				return createRescheduleButton(task);
+			case 5 :
+				return createMessageButton(task);
+			case 6 :
 				return createDoneButton(task);
 
 			default :
@@ -168,11 +180,11 @@ public class TaskTableModel extends AbstractTableModel
 
 		button.setIcon(CrmIcons.DONE);
 		if (task.getDue() != null && task.getDue().isBeforeNow())
-			button.setBackground(new Color(255, 0, 0, 100));
+			button.setBackground(new Color(255, 0, 0, ALPHA));
 		else if (task.getDue() != null && task.getDue().toLocalDate().isEqual(new LocalDate()))
-			button.setBackground(new Color(255, 100, 100, 100));
+			button.setBackground(new Color(255, 100, 100, ALPHA));
 		else
-			button.setBackground(new Color(100, 255, 100, 100));
+			button.setBackground(new Color(100, 255, 100, ALPHA));
 		button.setToolTipText("Mark as done...");
 
 		return button;
@@ -224,7 +236,7 @@ public class TaskTableModel extends AbstractTableModel
 			}
 		});
 
-		button.setBackground(new Color(255, 175, 80, 100));
+		button.setBackground(new Color(255, 175, 80, ALPHA));
 		button.setIcon(CrmIcons.RECHEDULE);
 		button.setToolTipText("Reschedule task...");
 
@@ -244,9 +256,109 @@ public class TaskTableModel extends AbstractTableModel
 		});
 
 
-		button.setBackground(new Color(90, 115, 255, 100));
+		button.setBackground(new Color(90, 115, 255, ALPHA));
 		button.setIcon(CrmIcons.VIEW);
 		button.setToolTipText("View task...");
+
+		return button;
+	}
+
+	private JButton createViewRelationButton(final Task task)
+	{
+		final JButton button = new JButton();
+		button.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				String url = CrmManager.createObjectUrl(task.getParentType(), task.getParentId());
+				DesktopUtil.openBrowser(url);
+			}
+		});
+
+
+		button.setBackground(new Color(120, 165, 255, ALPHA));
+
+		switch (task.getParentType())
+		{
+			case "Cases" :
+				button.setIcon(CrmIcons.WARN);
+				break;
+			case "Leads" :
+			case "Contacts" :
+			case "Accounts" :
+			case "Prospects" :
+				button.setIcon(CrmIcons.USER);
+				break;
+			case "Opportunities" :
+				button.setIcon(CrmIcons.BELL);
+				break;
+			default :
+				button.setVisible(false);
+				button.setEnabled(false);
+				break;
+		}
+
+		if (task.getParentId() == null || task.getParentId().trim().isEmpty())
+		{
+			button.setVisible(false);
+			button.setEnabled(false);
+		}
+
+		button.setToolTipText("View " + task.getParentType());
+
+		return button;
+	}
+
+	private JButton createMessageButton(final Task task)
+	{
+		final JButton button = new JButton();
+		button.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				Collection<HasEmail> email = new HashSet<>();
+				String subject = "";
+				switch (task.getParentType())
+				{
+					case "Cases" :
+						Case c = CrmManager.getCase(task.getParentId());
+						final Collection<Contact> contacts = CrmManager.getContactListByCase(c.getId());
+
+						StringBuilder subjectSB = new StringBuilder();
+						subjectSB.append("[CASE:").append(c.getNumber()).append("] ");
+						subjectSB.append(c.getTitle());
+
+						email.addAll(contacts);
+						subject = subjectSB.toString();
+						break;
+					case "Leads" :
+						Lead lead = CrmManager.getLead(task.getParentId());
+						email.add(lead);
+						break;
+					case "Contacts" :
+						Contact contact = CrmManager.getContact(task.getParentId());
+						email.add(contact);
+						break;
+					case "Accounts" :
+						break;
+					case "Opportunities" :
+						email.addAll(CrmManager.getContactListByOpportunity(task.getParentId()));
+						break;
+					default :
+						break;
+				}
+				SendEmailDialog.sendEmail(null, subject, email);
+			}
+		});
+
+
+		button.setBackground(new Color(255, 255, 255, ALPHA));
+
+
+		button.setIcon(CrmIcons.MAIL);
+		button.setToolTipText("Create email...");
 
 		return button;
 	}

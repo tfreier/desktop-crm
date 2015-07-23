@@ -5,10 +5,20 @@ package net.combase.desktopcrm.swing;
 
 import java.awt.Desktop;
 import java.awt.Desktop.Action;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import ch.swingfx.twinkle.NotificationBuilder;
 import ch.swingfx.twinkle.style.closebutton.NullCloseButton;
@@ -72,14 +82,59 @@ public class DesktopUtil {
 		}
 	}
 
+
+	public static void openHtmlEmail(String mailTo, String subject, String body)
+	{
+		try
+		{
+			Message message = new MimeMessage(Session.getInstance(System.getProperties()));
+			// message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+			message.setSubject(subject);
+			// create the message part
+			MimeBodyPart content = new MimeBodyPart();
+			// fill message
+			content.setText(body, "UTF-8", "html");
+			Multipart multipart = new MimeMultipart();
+			multipart.addBodyPart(content);
+			// add attachments
+/*
+ * for (File file : attachments) { MimeBodyPart attachment = new MimeBodyPart(); DataSource source =
+ * new FileDataSource(file); attachment.setDataHandler(new DataHandler(source));
+ * attachment.setFileName(file.getName()); multipart.addBodyPart(attachment); }
+ */
+			// integration
+			message.setContent(multipart);
+			// store file
+			File file = File.createTempFile("crmMail", ".eml");
+			file.deleteOnExit();
+			message.writeTo(new FileOutputStream(file));
+			open(file.toURI());
+		}
+		catch (MessagingException | IOException ex)
+		{
+			ex.printStackTrace();
+		}
+
+	}
+
 	public static void openEmail(String mailTo, String subject)
 	{
+		openEmail(mailTo, subject, "");
+	}
+
+	public static void openEmail(String mailTo, String subject, String body)
+	{
 		URI uri = null;
+		if (subject == null)
+			subject = "";
+		if (body == null)
+			body = "";
 		try
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.append("mailto:").append(mailTo);
 			sb.append("?SUBJECT=").append(URLEncoder.encode(subject, "UTF-8"));
+			sb.append("&BODY=").append(URLEncoder.encode(body, "UTF-8"));
 
 			uri = new URI(sb.toString());
 		}

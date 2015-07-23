@@ -6,13 +6,38 @@ package net.combase.desktopcrm.domain;
 import org.joda.time.DateTime;
 
 /**
- * @author till
+ * 
+ * @author "Till Freier"
  *
  */
 public class Task extends AbstractCrmObject
 {
 	private DateTime due;
 
+	private String parentType;
+
+	private String parentId;
+
+
+	public String getParentId()
+	{
+		return parentId;
+	}
+
+	public void setParentId(String parentId)
+	{
+		this.parentId = parentId;
+	}
+
+	public String getParentType()
+	{
+		return parentType;
+	}
+
+	public void setParentType(String parentType)
+	{
+		this.parentType = parentType;
+	}
 
 	public DateTime getDue()
 	{

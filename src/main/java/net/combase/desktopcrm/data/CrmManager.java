@@ -16,11 +16,13 @@ import net.combase.desktopcrm.domain.AbstractCrmObject;
 import net.combase.desktopcrm.domain.Call;
 import net.combase.desktopcrm.domain.Case;
 import net.combase.desktopcrm.domain.Contact;
+import net.combase.desktopcrm.domain.EmailTemplate;
 import net.combase.desktopcrm.domain.Lead;
 import net.combase.desktopcrm.domain.Opportunity;
 import net.combase.desktopcrm.domain.Settings;
 import net.combase.desktopcrm.domain.Task;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -60,6 +62,9 @@ public class CrmManager
 			String dueDate = bean.get("date_due");
 			if (dueDate != null && !dueDate.trim().isEmpty())
 				obj.setDue(new DateTime(formatter.parseDateTime(dueDate)).plusHours(gmtOffset));
+
+			obj.setParentType(bean.get("parent_type"));
+			obj.setParentId(bean.get("parent_id"));
 		}
 
 
@@ -127,6 +132,47 @@ public class CrmManager
 		public void prepare(Contact obj, SugarEntity bean)
 		{
 			obj.setEmail(bean.get("email1"));
+			obj.setFirstname(bean.get("first_name"));
+		}
+
+
+	};
+
+	private static final CrmObjectCreator<Lead> LEAD_CREATOR = new CrmObjectCreator<Lead>()
+	{
+
+		@Override
+		public Lead createObject(String id, String title)
+		{
+			return new Lead(id, title);
+		}
+
+		@Override
+		public void prepare(Lead obj, SugarEntity bean)
+		{
+			obj.setEmail(bean.get("email1"));
+			obj.setFirstname(bean.get("first_name"));
+		}
+
+
+	};
+
+	private static final CrmObjectCreator<EmailTemplate> EMAIL_TEMPLATE_CREATOR = new CrmObjectCreator<EmailTemplate>()
+	{
+
+		@Override
+		public EmailTemplate createObject(String id, String title)
+		{
+			return new EmailTemplate(id, title);
+		}
+
+		@Override
+		public void prepare(EmailTemplate obj, SugarEntity bean)
+		{
+			String body = StringEscapeUtils.unescapeHtml4(bean.get("body_html"));
+			obj.setHtmlBody("<html><body>" + body + "</body></html>");
+			obj.setBody(bean.get("body"));
+			obj.setSubject(bean.get("subject"));
 		}
 
 
@@ -263,22 +309,7 @@ public class CrmManager
 		if (!checkSetup())
 			return new ArrayList<>();
 
-		final CrmObjectCreator<Lead> creator = new CrmObjectCreator<Lead>()
-		{
 
-			@Override
-			public Lead createObject(String id, String title)
-			{
-				return new Lead(id, title);
-			}
-
-			@Override
-			public void prepare(Lead obj, SugarEntity bean)
-			{
-			}
-
-
-		};
 
 		String moduleName = "Leads";
 		String userId = session.getUser().getUserId(); // "a2e0e9a3-4d63-a56b-315b-546a4cdf41a8";//
@@ -286,7 +317,23 @@ public class CrmManager
 			" leads.converted=0" + " and leads.assigned_user_id='" + userId + "'";
 
 
-		Collection<Lead> collection = loadCrmObjects(creator, moduleName, query);
+		Collection<Lead> collection = loadCrmObjects(LEAD_CREATOR, moduleName, query);
+
+		return new ArrayList<>(collection);
+	}
+
+	public static List<EmailTemplate> getEmailTemplateList()
+	{
+		if (!checkSetup())
+			return new ArrayList<>();
+
+
+		String moduleName = "EmailTemplates";
+		String query = "";
+
+
+		Collection<EmailTemplate> collection = loadCrmObjects(EMAIL_TEMPLATE_CREATOR, moduleName,
+			query);
 
 		return new ArrayList<>(collection);
 	}
@@ -298,7 +345,7 @@ public class CrmManager
 
 
 		String moduleName = "Cases";
-		String userId = session.getUser().getUserId(); // "a2e0e9a3-4d63-a56b-315b-546a4cdf41a8";//
+		String userId = session.getUser().getUserId();
 		String query = "cases.state<>'Closed' and cases.state<>'closed'" +
 			" and cases.assigned_user_id='" + userId + "'";
 
@@ -315,7 +362,7 @@ public class CrmManager
 			return new ArrayList<>();
 
 		String moduleName = "Opportunities";
-		String userId = session.getUser().getUserId(); // "a2e0e9a3-4d63-a56b-315b-546a4cdf41a8";//
+		String userId = session.getUser().getUserId();
 		String query = "opportunities.sales_stage not like 'Closed%' and opportunities.sales_stage not like 'closed%'" +
 			" and opportunities.assigned_user_id='" + userId + "'";
 
@@ -357,6 +404,28 @@ public class CrmManager
 		{
 			List<SugarEntity> result = api.getRelationsships(session, "Cases", caseId, "contacts",
 				"");
+
+			return convertEntityList(CONTACT_CREATOR, "Contacts", result);
+		}
+		catch (SugarApiException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		return new ArrayList<>();
+	}
+
+	public static Collection<Contact> getContactListByOpportunity(String id)
+	{
+		if (!checkSetup())
+			return new ArrayList<>();
+
+		try
+		{
+			List<SugarEntity> result = api.getRelationsships(session, "Opportunities", id,
+				"contacts", "");
 
 			return convertEntityList(CONTACT_CREATOR, "Contacts", result);
 		}
@@ -418,14 +487,38 @@ public class CrmManager
 		List<T> result = new ArrayList<>(beans.size());
 		for (SugarEntity entity : beans)
 		{
-			final T t = creator.createObject(entity.getId(), entity.get("name"));
-			t.setViewUrl(sugarUrl + "/index.php?action=DetailView&module=" + moduleName +
-				"&record=" + entity.getId());
-			creator.prepare(t, entity);
+			final T t = convertEntity(creator, moduleName, entity);
 			result.add(t);
 		}
 
 		return result;
+	}
+
+	/**
+	 * @param creator
+	 * @param moduleName
+	 * @param entity
+	 * @return
+	 */
+	private static <T extends AbstractCrmObject> T convertEntity(final CrmObjectCreator<T> creator,
+		String moduleName, SugarEntity entity)
+	{
+		String id = entity.getId();
+		final T t = creator.createObject(id, entity.get("name"));
+		t.setViewUrl(createObjectUrl(moduleName, id));
+		creator.prepare(t, entity);
+		return t;
+	}
+
+	/**
+	 * @param moduleName
+	 * @param id
+	 * @return
+	 */
+	public static String createObjectUrl(String moduleName, String id)
+	{
+		return sugarUrl + "/index.php?action=DetailView&module=" + moduleName +
+			"&record=" + id;
 	}
 
 
@@ -559,6 +652,49 @@ public class CrmManager
 		set.addAll(collection);
 
 		return new ArrayList<>(set);
+	}
+
+	public static Case getCase(String id)
+	{
+		return loadCrmObject(id, "Cases", CASE_CREATOR);
+	}
+
+	public static Lead getLead(String id)
+	{
+		return loadCrmObject(id, "Leads", LEAD_CREATOR);
+	}
+
+	public static Opportunity getOpprtunity(String id)
+	{
+		return loadCrmObject(id, "Opportunities", OPPORTUNITY_CREATOR);
+	}
+
+	/**
+	 * @param parentId
+	 * @param moduleName
+	 * @param creator
+	 */
+	private static <T extends AbstractCrmObject> T loadCrmObject(String parentId,
+		final String moduleName, CrmObjectCreator<T> creator)
+	{
+		try
+		{
+			SugarEntity bean = api.getBean(session, moduleName, parentId);
+
+			return convertEntity(creator, moduleName, bean);
+
+		}
+		catch (SugarApiException e)
+		{
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	public static Contact getContact(String id)
+	{
+		return loadCrmObject(id, "Contacts", CONTACT_CREATOR);
 	}
 
 

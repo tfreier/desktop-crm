@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.TimerTask;
 
 import javax.swing.JButton;
@@ -15,10 +14,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import net.combase.desktopcrm.data.CrmManager;
-import net.combase.desktopcrm.domain.Task;
+import net.combase.desktopcrm.data.CrmHelper;
+import net.combase.desktopcrm.domain.EmailTemplate;
 
-public class TaskTablePanel extends JPanel
+public class EmailTemplateTablePanel extends JPanel
 {
 	/**
 	 * 
@@ -29,12 +28,13 @@ public class TaskTablePanel extends JPanel
 	/**
 	 * Create the panel.
 	 */
-	public TaskTablePanel()
+	public EmailTemplateTablePanel()
 	{
 		setLayout(new BorderLayout(0, 0));
 
 
-		final TaskTableModel model = new TaskTableModel(new ArrayList<Task>());
+		final EmailTemplateTableModel model = new EmailTemplateTableModel(
+			new ArrayList<EmailTemplate>());
 
 		table = new JTable(model);
 
@@ -74,13 +74,8 @@ public class TaskTablePanel extends JPanel
 			}
 		});
 
-		table.getColumnModel().getColumn(1).setMaxWidth(140);
-		table.getColumnModel().getColumn(1).setMinWidth(140);
+		table.getColumnModel().getColumn(1).setMaxWidth(30);
 		table.getColumnModel().getColumn(2).setMaxWidth(30);
-		table.getColumnModel().getColumn(3).setMaxWidth(30);
-		table.getColumnModel().getColumn(4).setMaxWidth(30);
-		table.getColumnModel().getColumn(5).setMaxWidth(30);
-		table.getColumnModel().getColumn(6).setMaxWidth(30);
 		table.setRowHeight(30);
 
 		add(table.getTableHeader(), BorderLayout.NORTH);
@@ -93,11 +88,10 @@ public class TaskTablePanel extends JPanel
 			@Override
 			public void run()
 			{
-				List<Task> updatedList = CrmManager.getTaskList();
-				System.out.println(updatedList);
-				model.update(updatedList);
+				CrmHelper.updateEmailTemplateCache();
+				model.update(CrmHelper.getCachedEmailTemplates());
 			}
-		}, 500, 120000);
+		}, 1000, 987000);
 	}
 
 }
