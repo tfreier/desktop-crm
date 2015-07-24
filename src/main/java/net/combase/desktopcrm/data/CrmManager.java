@@ -14,6 +14,7 @@ import java.util.TreeSet;
 
 import net.combase.desktopcrm.domain.AbstractCrmObject;
 import net.combase.desktopcrm.domain.Call;
+import net.combase.desktopcrm.domain.Campaign;
 import net.combase.desktopcrm.domain.Case;
 import net.combase.desktopcrm.domain.Contact;
 import net.combase.desktopcrm.domain.EmailTemplate;
@@ -33,6 +34,7 @@ import com.sugarcrm.api.SugarCredentials;
 import com.sugarcrm.api.SugarEntity;
 import com.sugarcrm.api.SugarSession;
 import com.sugarcrm.api.v4.impl.SugarApi;
+import com.sugarcrm.api.v4.impl.SugarBean;
 
 /**
  * @author till
@@ -113,6 +115,23 @@ public class CrmManager
 
 		@Override
 		public void prepare(Opportunity obj, SugarEntity bean)
+		{
+		}
+
+
+	};
+
+	public static final CrmObjectCreator<Campaign> CAMPAIGN_CREATOR = new CrmObjectCreator<Campaign>()
+	{
+
+		@Override
+		public Campaign createObject(String id, String title)
+		{
+			return new Campaign(id, title);
+		}
+
+		@Override
+		public void prepare(Campaign obj, SugarEntity bean)
 		{
 		}
 
@@ -669,17 +688,27 @@ public class CrmManager
 		return loadCrmObject(id, "Opportunities", OPPORTUNITY_CREATOR);
 	}
 
+	public static Campaign getCampaignByName(String name)
+	{
+		Collection<Campaign> result = loadCrmObjects(CAMPAIGN_CREATOR, "Campaigns",
+			"campaigns.name='" + name + "'");
+		if (result.isEmpty())
+			return null;
+
+		return result.iterator().next();
+	}
+
 	/**
-	 * @param parentId
+	 * @param id
 	 * @param moduleName
 	 * @param creator
 	 */
-	private static <T extends AbstractCrmObject> T loadCrmObject(String parentId,
+	private static <T extends AbstractCrmObject> T loadCrmObject(String id,
 		final String moduleName, CrmObjectCreator<T> creator)
 	{
 		try
 		{
-			SugarEntity bean = api.getBean(session, moduleName, parentId);
+			SugarEntity bean = api.getBean(session, moduleName, id);
 
 			return convertEntity(creator, moduleName, bean);
 
@@ -697,5 +726,37 @@ public class CrmManager
 		return loadCrmObject(id, "Contacts", CONTACT_CREATOR);
 	}
 
+	public static Lead saveLead(Lead l)
+	{
+		SugarBean b = new SugarBean("Leads");
+		b.set("first_name", l.getFirstname());
+		b.set("last_name", l.getLastName());
+		b.set("account_name", l.getAccountName());
+		b.set("description", l.getDescription());
+		b.set("email1", l.getEmail());
+		b.set("phone_work", l.getPhone());
+		b.set("title", l.getJobTitle());
+		b.set("primary_address_city", l.getCity());
+		b.set("primary_address_state", l.getState());
+		b.set("primary_address_country", l.getCountry());
+		b.set("primary_address_street", l.getAddress());
+		b.set("primary_address_postalcode", l.getZip());
+		b.set("account_type_c", l.getType());
+		b.set("assigned_user_id", session.getUser().getUserId());
+		b.set("campaign_id", l.getCampaignId());
+
+		try
+		{
+			String result = api.setBean(session, b);
+
+			return getLead(result);
+		}
+		catch (SugarApiException e)
+		{
+			e.printStackTrace();
+		}
+
+		return null;
+	}
 
 }

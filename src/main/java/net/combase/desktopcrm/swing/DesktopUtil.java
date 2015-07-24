@@ -126,15 +126,15 @@ public class DesktopUtil {
 	{
 		URI uri = null;
 		if (subject == null)
-			subject = "";
+			subject = " ";
 		if (body == null)
 			body = "";
 		try
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.append("mailto:").append(mailTo);
-			sb.append("?SUBJECT=").append(URLEncoder.encode(subject, "UTF-8"));
-			sb.append("&BODY=").append(URLEncoder.encode(body, "UTF-8"));
+			sb.append("?SUBJECT=").append(URLEncoder.encode(subject, "UTF-8").replace("+", "%20"));
+			sb.append("&BODY=").append(URLEncoder.encode(body, "UTF-8").replace("+", "%20"));
 
 			uri = new URI(sb.toString());
 		}

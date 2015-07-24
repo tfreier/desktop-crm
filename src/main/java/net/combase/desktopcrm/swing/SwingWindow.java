@@ -2,10 +2,20 @@ package net.combase.desktopcrm.swing;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.Reader;
+import java.nio.ByteBuffer;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -15,6 +25,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
+
+import net.combase.desktopcrm.data.FileImporter;
+import net.combase.desktopcrm.domain.Lead;
+
+import org.apache.commons.io.IOUtils;
 
 public class SwingWindow
 {
@@ -149,6 +164,128 @@ public class SwingWindow
 		});
 
 		NotificationManager.init();
+
+		createDropListener(frame);
+	}
+
+	private void createDropListener(JFrame frame2)
+	{
+		DropTargetListener dropListener = new java.awt.dnd.DropTargetListener()
+		{
+			@Override
+			public void dragEnter(java.awt.dnd.DropTargetDragEvent evt)
+			{
+				evt.acceptDrag(java.awt.dnd.DnDConstants.ACTION_COPY);
+			}
+
+			@Override
+			public void dragOver(java.awt.dnd.DropTargetDragEvent evt)
+			{
+
+			}
+
+			@Override
+			public void drop(java.awt.dnd.DropTargetDropEvent evt)
+			{
+				try
+				{
+					java.awt.datatransfer.Transferable tr = evt.getTransferable();
+
+					if (tr.isDataFlavorSupported(java.awt.datatransfer.DataFlavor.javaFileListFlavor))
+					{
+						evt.acceptDrop(java.awt.dnd.DnDConstants.ACTION_COPY);
+
+						List<File> fileList = (List<File>)tr.getTransferData(java.awt.datatransfer.DataFlavor.javaFileListFlavor);
+						for (File file : fileList)
+						{
+							Lead lead = FileImporter.importFile(file);
+							DesktopUtil.openBrowser(lead.getViewUrl());
+						}
+					}
+					else
+					{
+						DataFlavor[] flavors = tr.getTransferDataFlavors();
+						boolean handled = false;
+						for (DataFlavor df : flavors)
+						{
+							if (df.isRepresentationClassReader())
+							{
+								evt.acceptDrop(java.awt.dnd.DnDConstants.ACTION_COPY);
+
+								Reader reader = df.getReaderForText(tr);
+
+								BufferedReader br = new BufferedReader(reader);
+
+								String line = null;
+								while ((line = br.readLine()) != null)
+									System.out.println(line);
+
+								// Mark that drop is completed.
+								evt.getDropTargetContext().dropComplete(true);
+								handled = true;
+								break;
+							}
+						}
+						if (!handled)
+						{
+							for (DataFlavor df : flavors)
+							{
+								try
+								{
+									if (df.isRepresentationClassInputStream())
+									{
+										evt.acceptDrop(java.awt.dnd.DnDConstants.ACTION_COPY);
+										InputStream transferData = (InputStream)tr.getTransferData(df);
+										char[] bArray = IOUtils.toCharArray(transferData,
+											"UTF-16LE");
+										String str = new String(bArray);
+										System.out.println("IS Line: " + str);
+									}
+									else if (df.isRepresentationClassByteBuffer())
+									{
+										evt.acceptDrop(java.awt.dnd.DnDConstants.ACTION_COPY);
+										ByteBuffer bf = (ByteBuffer)tr.getTransferData(df);
+										String str = new String(bf.array(), "UTF-16LE");
+										System.out.println("byte buffer: " + str);
+									}
+									else
+									{
+										evt.acceptDrop(java.awt.dnd.DnDConstants.ACTION_COPY);
+										System.out.println(tr.getTransferData(df));
+
+									}
+								}
+								catch (java.awt.dnd.InvalidDnDOperationException e)
+								{
+									System.err.println(e.getMessage());
+								}
+							}
+						}
+
+					}
+				}
+				catch (java.io.IOException | UnsupportedFlavorException io)
+				{
+					io.printStackTrace();
+				}
+
+			}
+
+			@Override
+			public void dragExit(java.awt.dnd.DropTargetEvent evt)
+			{
+
+			}
+
+			@Override
+			public void dropActionChanged(java.awt.dnd.DropTargetDragEvent evt)
+			{
+				evt.acceptDrag(java.awt.dnd.DnDConstants.ACTION_COPY);
+
+			}
+		};
+
+		frame.setDropTarget(new DropTarget(frame, dropListener));
 	}
 
 }

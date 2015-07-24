@@ -26,7 +26,9 @@ import com.sugarcrm.api.SugarSession;
 
 /**
  * Sugar API v4 specific stuff
+ * 
  * @author mmarum
+ * @author Till Freier
  */
 public class SugarApi
 {
@@ -476,7 +478,6 @@ public class SugarApi
 		try
 		{
 			String jsonStr = this.json.toJson(req);
-			System.out.println(jsonStr);
 			response = postToSugar(this.REST_ENDPOINT + "?method=get_entry_list&response_type=JSON&input_type=JSON&rest_data=" + this.codec.encode(jsonStr));
 		}
 		catch (final EncoderException e)
@@ -534,7 +535,6 @@ public class SugarApi
 
 	public String postToSugar(final String urlStr) throws Exception
 	{
-		System.out.println(urlStr);
 		final URL url = new URL(urlStr);
 		final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("POST");
@@ -560,8 +560,6 @@ public class SugarApi
 		rd.close();
 
 		conn.disconnect();
-		System.out.println(sb.toString());
-		System.out.println();
 
 		return sb.toString();
 	}
