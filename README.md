@@ -18,11 +18,12 @@ This project provides a simple desktop application that makes working with your 
 - Case email using the desktop email application
 - Task due notification
 - Follow up reminders for cases, opportunities and leads
+- Open email templates with external email client
 
 ## Planned Feature
 
-- Open email templates with external email client
 - Opportunity list with email and update function
+- Support for HTML email templates and attachments
 - Push to call
 
 ## Releases 
