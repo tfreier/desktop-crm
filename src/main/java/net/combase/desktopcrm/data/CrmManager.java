@@ -169,8 +169,20 @@ public class CrmManager
 		@Override
 		public void prepare(Lead obj, SugarEntity bean)
 		{
-			obj.setEmail(bean.get("email1"));
 			obj.setFirstname(bean.get("first_name"));
+			obj.setLastName(bean.get("last_name"));
+			obj.setAccountName(bean.get("account_name"));
+			obj.setDescription(bean.get("description"));
+			obj.setEmail(bean.get("email1"));
+			obj.setPhone(bean.get("phone_work"));
+			obj.setJobTitle(bean.get("title"));
+			obj.setCity(bean.get("primary_address_city"));
+			obj.setState(bean.get("primary_address_state"));
+			obj.setCountry(bean.get("primary_address_country"));
+			obj.setAddress(bean.get("primary_address_street"));
+			obj.setZip(bean.get("primary_address_postalcode"));
+			obj.setType(bean.get("account_type_c"));
+			obj.setCampaignId(bean.get("campaign_id"));
 		}
 
 
@@ -336,7 +348,8 @@ public class CrmManager
 			" leads.converted=0" + " and leads.assigned_user_id='" + userId + "'";
 
 
-		Collection<Lead> collection = loadCrmObjects(LEAD_CREATOR, moduleName, query);
+		Collection<Lead> collection = loadCrmObjects(LEAD_CREATOR, moduleName, query,
+			"leads.date_entered DESC");
 
 		return new ArrayList<>(collection);
 	}

@@ -138,6 +138,7 @@ public class SwingWindow
 		tabbedPane.addTab("Tasks", CrmIcons.DONE, new TaskTablePanel());
 		tabbedPane.addTab("Calls", CrmIcons.CALL, new CallTablePanel());
 		tabbedPane.addTab("Cases", CrmIcons.WARN, new CaseTablePanel());
+		tabbedPane.addTab("Leads", CrmIcons.USER, new LeadTablePanel());
 		tabbedPane.addTab("E-Mail Templates", CrmIcons.MAIL, new EmailTemplateTablePanel());
 
 		frame.getContentPane().add(tabbedPane);
