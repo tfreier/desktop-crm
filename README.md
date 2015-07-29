@@ -20,7 +20,7 @@ This project provides a simple desktop application that makes working with your 
 - Follow up reminders for cases, opportunities and leads
 - Open email templates with external email client
 
-## Planned Feature
+## Planned Features
 
 - Opportunity list with email and update function
 - Support for HTML email templates and attachments
