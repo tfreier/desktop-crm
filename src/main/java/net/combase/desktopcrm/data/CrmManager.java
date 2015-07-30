@@ -361,7 +361,7 @@ public class CrmManager
 
 
 		String moduleName = "EmailTemplates";
-		String query = "";
+		String query = "type<>'campaign'";
 
 
 		Collection<EmailTemplate> collection = loadCrmObjects(EMAIL_TEMPLATE_CREATOR, moduleName,
