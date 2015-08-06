@@ -182,7 +182,7 @@ public class TaskTableModel extends AbstractTableModel
 		if (task.getDue() != null && task.getDue().isBeforeNow())
 			button.setBackground(new Color(255, 0, 0, ALPHA));
 		else if (task.getDue() != null && task.getDue().toLocalDate().isEqual(new LocalDate()))
-			button.setBackground(new Color(255, 100, 100, ALPHA));
+			button.setBackground(new Color(255, 150, 0, ALPHA));
 		else
 			button.setBackground(new Color(100, 255, 100, ALPHA));
 		button.setToolTipText("Mark as done...");
@@ -236,7 +236,7 @@ public class TaskTableModel extends AbstractTableModel
 			}
 		});
 
-		button.setBackground(new Color(255, 175, 80, ALPHA));
+		button.setBackground(new Color(250, 245, 0, ALPHA));
 		button.setIcon(CrmIcons.RECHEDULE);
 		button.setToolTipText("Reschedule task...");
 
