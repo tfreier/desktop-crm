@@ -374,4 +374,9 @@ public class TaskTableModel extends AbstractTableModel
 	{
 		return COLUMN_NAMES.length;
 	}
+
+	public Task getTask(int row)
+	{
+		return data.get(row);
+	}
 }

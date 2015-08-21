@@ -2,6 +2,10 @@ package net.combase.desktopcrm.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -16,6 +20,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import net.combase.desktopcrm.data.CrmManager;
+import net.combase.desktopcrm.domain.Lead;
 import net.combase.desktopcrm.domain.Task;
 
 public class TaskTablePanel extends JPanel
@@ -85,6 +90,49 @@ public class TaskTablePanel extends JPanel
 
 		add(table.getTableHeader(), BorderLayout.NORTH);
 		add(new JScrollPane(table), BorderLayout.CENTER);
+
+		table.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mousePressed(MouseEvent me)
+			{
+				JTable table = (JTable)me.getSource();
+				if (me.getClickCount() == 2)
+				{
+					Point p = me.getPoint();
+					int row = table.rowAtPoint(p);
+					Task task = model.getTask(row);
+					String title = null;
+					String parentId = task.getParentId();
+					switch (task.getParentType())
+					{
+						case "Cases" :
+							title = CrmManager.getCase(parentId).getTitle();
+							break;
+						case "Leads" :
+							Lead lead = CrmManager.getLead(parentId);
+							title = lead.getTitle();
+							title += " - " + lead.getAccountName();
+							break;
+						case "Contacts" :
+							title = CrmManager.getContact(parentId).getTitle();
+							break;
+						case "Accounts" :
+							title = CrmManager.getCase(parentId).getTitle();
+							break;
+						case "Opportunities" :
+							title = CrmManager.getOpprtunity(parentId).getTitle();
+							break;
+						default :
+							break;
+					}
+					StringSelection stringSelection = new StringSelection(title);
+					Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+					clipboard.setContents(stringSelection, null);
+
+				}
+			}
+		});
 
 
 		java.util.Timer t = new java.util.Timer(true);
