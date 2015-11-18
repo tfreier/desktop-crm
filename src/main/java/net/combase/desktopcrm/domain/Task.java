@@ -18,6 +18,18 @@ public class Task extends AbstractCrmObject
 
 	private String parentId;
 
+	private String description;
+
+
+	public String getDescription()
+	{
+		return description;
+	}
+
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
 
 	public String getParentId()
 	{
@@ -52,5 +64,11 @@ public class Task extends AbstractCrmObject
 	public Task(String id, String title)
 	{
 		super(id, title);
+	}
+
+	@Override
+	public String getCrmEntityType()
+	{
+		return "Tasks";
 	}
 }

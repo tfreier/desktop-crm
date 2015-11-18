@@ -6,6 +6,7 @@ package net.combase.desktopcrm.swing;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -137,5 +138,10 @@ public class CaseTableModel extends AbstractTableModel
 	public int getColumnCount()
 	{
 		return COLUMN_NAMES.length;
+	}
+
+	public List<Case> getData()
+	{
+		return new ArrayList<>(data);
 	}
 }

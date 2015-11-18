@@ -15,4 +15,10 @@ public class Campaign extends AbstractCrmObject
 		super(id, title);
 	}
 
+	@Override
+	public String getCrmEntityType()
+	{
+		return "Campaigns";
+	}
+
 }

@@ -13,7 +13,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.combase.desktopcrm.domain.AbstractCrmObject;
+import net.combase.desktopcrm.domain.Account;
 import net.combase.desktopcrm.domain.Call;
+import net.combase.desktopcrm.domain.CallType;
 import net.combase.desktopcrm.domain.Campaign;
 import net.combase.desktopcrm.domain.Case;
 import net.combase.desktopcrm.domain.Contact;
@@ -26,6 +28,7 @@ import net.combase.desktopcrm.domain.Task;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -138,6 +141,23 @@ public class CrmManager
 
 	};
 
+	public static final CrmObjectCreator<Account> ACCOUNT_CREATOR = new CrmObjectCreator<Account>()
+	{
+
+		@Override
+		public Account createObject(String id, String title)
+		{
+			return new Account(id, title);
+		}
+
+		@Override
+		public void prepare(Account obj, SugarEntity bean)
+		{
+		}
+
+
+	};
+
 	public static final CrmObjectCreator<Contact> CONTACT_CREATOR = new CrmObjectCreator<Contact>()
 	{
 
@@ -153,7 +173,6 @@ public class CrmManager
 			obj.setEmail(bean.get("email1"));
 			obj.setFirstname(bean.get("first_name"));
 		}
-
 
 	};
 
@@ -175,6 +194,7 @@ public class CrmManager
 			obj.setDescription(bean.get("description"));
 			obj.setEmail(bean.get("email1"));
 			obj.setPhone(bean.get("phone_work"));
+			obj.setMobile(bean.get("phone_mobile"));
 			obj.setJobTitle(bean.get("title"));
 			obj.setCity(bean.get("primary_address_city"));
 			obj.setState(bean.get("primary_address_state"));
@@ -334,6 +354,172 @@ public class CrmManager
 
 		return null;
 	}
+
+	public static Contact getContactByNumber(String number)
+	{
+		return loadCrmObjectByNumber(CONTACT_CREATOR, "Contacts", number);
+	}
+
+	public static Lead getLeadByNumber(String number)
+	{
+		return loadCrmObjectByNumber(LEAD_CREATOR, "Leads", number);
+	}
+
+	private static <T extends AbstractCrmObject> T loadCrmObjectByNumber(
+		final CrmObjectCreator<T> creator, String moduleName, String number)
+	{
+		checkSetup();
+
+		StringBuilder numberPattern = new StringBuilder();
+		char[] charArray = number.toCharArray();
+		for (char c : charArray)
+		{
+			numberPattern.append('%').append(c);
+		}
+		numberPattern.append('%');
+		String nq = numberPattern.toString();
+
+		StringBuilder q = new StringBuilder();
+
+		q.append('(').append(moduleName.toLowerCase()).append(".phone_work like '");
+		q.append(nq)
+			.append("' or ")
+			.append(moduleName.toLowerCase())
+			.append(".phone_mobile like '");
+		q.append(nq).append("') ");
+
+
+		final Collection<T> collection = loadCrmObjects(creator, moduleName, q.toString());
+
+		final Iterator<T> iterator = collection.iterator();
+
+		if (iterator.hasNext())
+			return iterator.next();
+
+		return null;
+	}
+
+	public static Collection<Lead> findLeads(String search)
+	{
+		return loadCrmContactBySearch(LEAD_CREATOR, "Leads", search);
+	}
+
+	public static Collection<Contact> findContacts(String search)
+	{
+		return loadCrmContactBySearch(CONTACT_CREATOR, "Contacts", search);
+	}
+
+	private static <T extends Lead> Collection<T> loadCrmContactBySearch(
+		final CrmObjectCreator<T> creator, String moduleName, String search)
+	{
+		if (search == null || search.trim().isEmpty())
+			return Collections.emptySet();
+
+		checkSetup();
+
+		String[] words = search.split(" ");
+
+
+		StringBuilder q = new StringBuilder();
+
+		q.append('(');
+
+		if (words.length == 1)
+		{
+			q.append(moduleName.toLowerCase());
+			q.append(".first_name like '%");
+			q.append(words[0]).append("%' or ");
+			q.append(moduleName.toLowerCase());
+			q.append(".last_name like '%");
+			q.append(words[0]).append("%' ");
+		}
+		else
+		{
+			for (String w : words)
+			{
+				q.append('(');
+				q.append(moduleName.toLowerCase());
+				q.append(".first_name like '%");
+				q.append(w).append("%' or ");
+				q.append(moduleName.toLowerCase());
+				q.append(".last_name like '%");
+				q.append(w).append("%' ");
+				q.append(") and ");
+			}
+			q.append('1');
+		}
+
+		q.append(')');
+
+
+		final Collection<T> collection = loadCrmObjects(creator, moduleName, q.toString());
+
+		return collection;
+	}
+
+
+	public static Collection<Account> findAccount(String search)
+	{
+		if (search == null || search.trim().isEmpty())
+			return Collections.emptySet();
+
+		checkSetup();
+
+		StringBuilder q = new StringBuilder();
+
+		q.append('(');
+		q.append("accounts.name like '%");
+		q.append(search).append("%' ");
+		q.append(')');
+
+
+		final Collection<Account> collection = loadCrmObjects(ACCOUNT_CREATOR, "Accounts",
+			q.toString());
+
+		return collection;
+	}
+
+	public static Collection<Case> findCase(String search)
+	{
+		if (search == null || search.trim().isEmpty())
+			return Collections.emptySet();
+
+		checkSetup();
+
+		StringBuilder q = new StringBuilder();
+
+		q.append('(');
+		q.append("cases.name like '%");
+		q.append(search).append("%' ");
+		q.append(')');
+
+
+		final Collection<Case> collection = loadCrmObjects(CASE_CREATOR, "Cases", q.toString());
+
+		return collection;
+	}
+
+	public static Collection<Opportunity> findOpportunity(String search)
+	{
+		if (search == null || search.trim().isEmpty())
+			return Collections.emptySet();
+
+		checkSetup();
+
+		StringBuilder q = new StringBuilder();
+
+		q.append('(');
+		q.append("opportunities.name like '%");
+		q.append(search).append("%' ");
+		q.append(')');
+
+
+		final Collection<Opportunity> collection = loadCrmObjects(OPPORTUNITY_CREATOR,
+			"Opportunities", q.toString());
+
+		return collection;
+	}
+
 
 	public static List<Lead> getLeadList()
 	{
@@ -582,6 +768,43 @@ public class CrmManager
 			e.printStackTrace();
 		}
 	}
+
+	public static void createCall(Call c)
+	{
+		try
+		{
+			SugarEntity bean = new SugarBean("Calls");
+			bean.set("date_start", formatter.print(c.getStart().minusHours(gmtOffset)));
+			bean.set("date_end", formatter.print(new DateTime().minusHours(gmtOffset)));
+			
+			Duration d = new Duration(c.getStart(), new DateTime());
+			bean.set("duration_hours", String.valueOf(d.toPeriod().getHours()));
+			bean.set("duration_minutes", String.valueOf(d.toPeriod().getMinutes()));
+
+			bean.set("name", c.getTitle());
+			bean.set("description", c.getDescription());
+			bean.set("status", "Held");
+
+			bean.set("direction", c.getType() == CallType.OUTBOUND ? "Outbound" : "Inbound");
+			
+
+			bean.set("parent_type", c.getRelatedObjectType());
+			bean.set("parent_id", c.getRelatedObjectId());
+
+			String userId = session.getUser().getUserId();
+			bean.set("assigned_user_id", userId);
+
+
+			String id = api.setBean(session, bean);
+			api.setRelationsship(session, c.getRelatedObjectType(), c.getRelatedObjectId(),
+				"calls", id, false);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 
 	public static void completeTask(Task t)
 	{

@@ -20,6 +20,10 @@ public class Settings implements Serializable
 	private String password;
 	private int gmtOffset = 0;
 	private String accountCriteria;
+	private String asteriskHost;
+	private String asteriskUser;
+	private String asteriskPassword;
+	private String asteriskExtension;
 
 	private boolean callReminder = true;
 	private boolean taskReminder = true;
@@ -27,6 +31,46 @@ public class Settings implements Serializable
 	private boolean opportunityReminder = true;
 	private boolean caseReminder = true;
 
+
+	public String getAsteriskHost()
+	{
+		return asteriskHost;
+	}
+
+	public void setAsteriskHost(String asteriskHost)
+	{
+		this.asteriskHost = asteriskHost;
+	}
+
+	public String getAsteriskUser()
+	{
+		return asteriskUser;
+	}
+
+	public void setAsteriskUser(String asteriskUser)
+	{
+		this.asteriskUser = asteriskUser;
+	}
+
+	public String getAsteriskPassword()
+	{
+		return asteriskPassword;
+	}
+
+	public void setAsteriskPassword(String asteriskPassword)
+	{
+		this.asteriskPassword = asteriskPassword;
+	}
+
+	public String getAsteriskExtension()
+	{
+		return asteriskExtension;
+	}
+
+	public void setAsteriskExtension(String asteriskExtension)
+	{
+		this.asteriskExtension = asteriskExtension;
+	}
 
 	public boolean isCallReminder()
 	{

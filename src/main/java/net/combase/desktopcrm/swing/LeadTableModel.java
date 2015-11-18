@@ -6,6 +6,7 @@ package net.combase.desktopcrm.swing;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -129,4 +130,11 @@ public class LeadTableModel extends AbstractTableModel
 	{
 		return COLUMN_NAMES.length;
 	}
+
+	public List<Lead> getData()
+	{
+		return new ArrayList<Lead>(data);
+	}
+
+
 }

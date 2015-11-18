@@ -13,6 +13,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 
 import net.combase.desktopcrm.data.CrmManager;
@@ -81,6 +83,20 @@ public class LeadTablePanel extends JPanel
 		add(table.getTableHeader(), BorderLayout.NORTH);
 		add(new JScrollPane(table), BorderLayout.CENTER);
 
+		table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+		{
+
+			@Override
+			public void valueChanged(ListSelectionEvent e)
+			{
+				int index = e.getFirstIndex();
+				if (index < 0)
+					return;
+
+				Lead data = model.getData().get(index);
+				DataSelectionEventManager.dataSelected(data);
+			}
+		});
 
 		java.util.Timer t = new java.util.Timer(true);
 		t.schedule(new TimerTask()

@@ -26,5 +26,11 @@ public class Case extends AbstractCrmObject {
 		this.number = number;
 	}
 
+	@Override
+	public String getCrmEntityType()
+	{
+		return "Cases";
+	}
+
 
 }

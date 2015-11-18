@@ -13,4 +13,10 @@ public class Account extends AbstractCrmObject {
 		super(id, title);
 	}
 
+	@Override
+	public String getCrmEntityType()
+	{
+		return "Accounts";
+	}
+
 }

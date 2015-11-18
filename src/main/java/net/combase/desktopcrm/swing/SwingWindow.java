@@ -2,6 +2,7 @@ package net.combase.desktopcrm.swing;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.Frame;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DropTarget;
@@ -28,6 +29,7 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import net.combase.desktopcrm.data.FileImporter;
 import net.combase.desktopcrm.domain.Lead;
+import net.combase.desktopcrm.swing.DataSelectionEventManager.DataSelectionActivationListener;
 
 import org.apache.commons.io.IOUtils;
 
@@ -133,12 +135,13 @@ public class SwingWindow
 
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
-		JTabbedPane tabbedPane = new JTabbedPane();
+		final JTabbedPane tabbedPane = new JTabbedPane();
 
 		tabbedPane.addTab("Tasks", CrmIcons.DONE, new TaskTablePanel());
 		tabbedPane.addTab("Calls", CrmIcons.CALL, new CallTablePanel());
 		tabbedPane.addTab("Cases", CrmIcons.WARN, new CaseTablePanel());
 		tabbedPane.addTab("Leads", CrmIcons.USER, new LeadTablePanel());
+		tabbedPane.addTab("Search", CrmIcons.VIEW, new SearchTablePanel());
 		tabbedPane.addTab("E-Mail Templates", CrmIcons.MAIL, new EmailTemplateTablePanel());
 
 		frame.getContentPane().add(tabbedPane);
@@ -165,6 +168,22 @@ public class SwingWindow
 		});
 
 		NotificationManager.init();
+
+		DataSelectionEventManager.setDataSelActivationListener(new DataSelectionActivationListener()
+		{
+
+			@Override
+			public void initiateDataSelection()
+			{
+				tabbedPane.setSelectedIndex(4);
+				frame.setVisible(true);
+				frame.setState(Frame.NORMAL);
+				frame.setAlwaysOnTop(true);
+				frame.toFront();
+				frame.requestFocus();
+				frame.setAlwaysOnTop(false);
+			}
+		});
 
 		createDropListener(frame);
 	}

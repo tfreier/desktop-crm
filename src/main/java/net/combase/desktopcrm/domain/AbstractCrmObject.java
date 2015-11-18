@@ -7,14 +7,32 @@ package net.combase.desktopcrm.domain;
  * @author "Till Freier"
  *
  */
-public class AbstractCrmObject
+public abstract class AbstractCrmObject
 {
 	private String id;
 	private String viewUrl;
 	private String relatedObjectType;
-	private String realtedObjectUrl;
+	private String relatedObjectUrl;
+	private String relatedObjectId;
 	private String title;
 
+
+	public abstract String getCrmEntityType();
+
+	public String getRelatedObjectId()
+	{
+		return relatedObjectId;
+	}
+
+	public void setRelatedObjectId(String relatedObjectId)
+	{
+		this.relatedObjectId = relatedObjectId;
+	}
+
+	public AbstractCrmObject()
+	{
+		super();
+	}
 
 	public AbstractCrmObject(String id, String title)
 	{
@@ -48,14 +66,14 @@ public class AbstractCrmObject
 		this.relatedObjectType = relatedObjectType;
 	}
 
-	public String getRealtedObjectUrl()
+	public String getRelatedObjectUrl()
 	{
-		return realtedObjectUrl;
+		return relatedObjectUrl;
 	}
 
-	public void setRealtedObjectUrl(String realtedObjectUrl)
+	public void setRelatedObjectUrl(String realtedObjectUrl)
 	{
-		this.realtedObjectUrl = realtedObjectUrl;
+		this.relatedObjectUrl = realtedObjectUrl;
 	}
 
 	public String getTitle()

@@ -38,10 +38,27 @@ public class Lead extends AbstractCrmObject implements HasEmail
 
 	private String country;
 
+	private String mobile;
+
+	public Lead()
+	{
+		super();
+	}
 
 	public Lead(String id, String title)
 	{
 		super(id, title);
+	}
+
+
+	public String getMobile()
+	{
+		return mobile;
+	}
+
+	public void setMobile(String mobile)
+	{
+		this.mobile = mobile;
 	}
 
 	@Override
@@ -184,6 +201,12 @@ public class Lead extends AbstractCrmObject implements HasEmail
 	public void setCountry(String country)
 	{
 		this.country = country;
+	}
+
+	@Override
+	public String getCrmEntityType()
+	{
+		return "Leads";
 	}
 
 

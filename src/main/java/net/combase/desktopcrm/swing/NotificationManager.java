@@ -3,15 +3,19 @@
  */
 package net.combase.desktopcrm.swing;
 
+import java.awt.EventQueue;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import net.combase.desktopcrm.data.AsteriskManager;
+import net.combase.desktopcrm.data.AsteriskManager.AsteriskCallEventListener;
 import net.combase.desktopcrm.data.CrmHelper;
 import net.combase.desktopcrm.data.CrmManager;
 import net.combase.desktopcrm.data.DataStoreManager;
 import net.combase.desktopcrm.domain.AbstractCrmObject;
 import net.combase.desktopcrm.domain.Call;
+import net.combase.desktopcrm.domain.CallType;
 import ch.swingfx.twinkle.NotificationBuilder;
 import ch.swingfx.twinkle.event.NotificationEvent;
 import ch.swingfx.twinkle.event.NotificationEventAdapter;
@@ -24,6 +28,8 @@ public class NotificationManager
 {
 	private static Timer timer = null;
 
+	private static String lastCallNumber = "";
+
 	public static synchronized void init()
 	{
 		if (timer != null)
@@ -33,6 +39,53 @@ public class NotificationManager
 
 		initActionTimer();
 		initCallTimer();
+
+		AsteriskManager.setup();
+		AsteriskManager.addListener(new AsteriskCallEventListener()
+		{
+
+			@Override
+			public void incomingCall(final String number)
+			{
+				EventQueue.invokeLater(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						if (number.equals(lastCallNumber))
+						{
+							System.out.println("skip call event");
+							return;
+						}
+
+						new CallWindow(number, CallType.INBOUND);
+
+						lastCallNumber = number;
+					}
+				});
+			}
+
+			@Override
+			public void outgoingCall(final String number)
+			{
+				EventQueue.invokeLater(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						if (number.equals(lastCallNumber))
+						{
+							System.out.println("skip call event");
+							return;
+						}
+
+						new CallWindow(number, CallType.OUTBOUND);
+
+						lastCallNumber = number;
+					}
+				});
+			}
+		});
 	}
 
 	/**

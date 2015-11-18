@@ -13,6 +13,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import net.combase.desktopcrm.data.AsteriskManager;
 import net.combase.desktopcrm.data.CrmManager;
 import net.combase.desktopcrm.data.DataStoreManager;
 import net.combase.desktopcrm.domain.Settings;
@@ -28,6 +29,10 @@ public class CrmSettings extends JFrame {
 	private JTextField login;
 	private JPasswordField password;
 	private JSpinner spinner;
+	private JTextField asteriskManagerField;
+	private JTextField asteriskPasswordField;
+	private JTextField asteriskHostField;
+	private JTextField extensionField;
 
 
 	/**
@@ -35,7 +40,7 @@ public class CrmSettings extends JFrame {
 	 */
 	public CrmSettings() {
 		setTitle("CRM Settings");
-		setBounds(100, 100, 449, 264);
+		setBounds(100, 100, 449, 390);
 		setResizable(false);
 		setIconImage(CrmIcons.SETTINGS.getImage());
 		contentPane = new JPanel();
@@ -77,7 +82,7 @@ public class CrmSettings extends JFrame {
 				onSave();
 			}
 		});
-		btnSave.setBounds(301, 184, 117, 25);
+		btnSave.setBounds(308, 310, 117, 25);
 		contentPane.add(btnSave);
 		
 
@@ -96,6 +101,46 @@ public class CrmSettings extends JFrame {
 		spinner.setValue(settings.getGmtOffset());
 
 		contentPane.add(spinner);
+
+		asteriskManagerField = new JTextField();
+		asteriskManagerField.setBounds(139, 153, 279, 25);
+		contentPane.add(asteriskManagerField);
+		asteriskManagerField.setColumns(10);
+		asteriskManagerField.setText(settings.getAsteriskUser());
+
+		asteriskPasswordField = new JTextField();
+		asteriskPasswordField.setBounds(139, 190, 279, 25);
+		contentPane.add(asteriskPasswordField);
+		asteriskPasswordField.setColumns(10);
+		asteriskPasswordField.setText(settings.getAsteriskPassword());
+
+		asteriskHostField = new JTextField();
+		asteriskHostField.setBounds(139, 227, 279, 25);
+		contentPane.add(asteriskHostField);
+		asteriskHostField.setColumns(10);
+		asteriskHostField.setText(settings.getAsteriskHost());
+
+		JLabel lblAsteriskManager = new JLabel("Asterisk Manager");
+		lblAsteriskManager.setBounds(15, 153, 130, 15);
+		contentPane.add(lblAsteriskManager);
+
+		JLabel lblPassword_1 = new JLabel("Password");
+		lblPassword_1.setBounds(15, 190, 70, 15);
+		contentPane.add(lblPassword_1);
+
+		JLabel lblHost = new JLabel("Host");
+		lblHost.setBounds(15, 227, 70, 15);
+		contentPane.add(lblHost);
+
+		extensionField = new JTextField();
+		extensionField.setBounds(139, 264, 279, 25);
+		contentPane.add(extensionField);
+		extensionField.setColumns(10);
+		extensionField.setText(settings.getAsteriskExtension());
+
+		JLabel lblExtension = new JLabel("Extension");
+		lblExtension.setBounds(12, 264, 70, 15);
+		contentPane.add(lblExtension);
 	}
 
 
@@ -105,15 +150,33 @@ public class CrmSettings extends JFrame {
 		String user = login.getText();
 		String pwd = String.valueOf(password.getPassword());
 		int offset = (int)spinner.getValue();
+		String asteriskHost = asteriskHostField.getText();
+		String asteriskUser = asteriskManagerField.getText();
+		String asteriskPassword = asteriskPasswordField.getText();
+		String asteriskExtension = extensionField.getText();
 		
 		Settings settings = DataStoreManager.getSettings();
 		settings.setCrmUrl(url);
 		settings.setUser(user);
 		settings.setPassword(pwd);
 		settings.setGmtOffset(offset);
+		settings.setAsteriskHost(asteriskHost);
+		settings.setAsteriskExtension(asteriskExtension);
+		settings.setAsteriskHost(asteriskHost);
+		settings.setAsteriskPassword(asteriskPassword);
+		settings.setAsteriskUser(asteriskUser);
 		
 		DataStoreManager.writeSettings(settings);
 		
+		if (asteriskHost != null && !asteriskHost.trim().isEmpty())
+		{
+			if (!AsteriskManager.setup())
+			{
+				JOptionPane.showMessageDialog(this, "The Asterisk connection failed!");
+				return;
+			}
+		}
+
 		if (!CrmManager.setup())
 			JOptionPane.showMessageDialog(this, "The CRM connection failed!");
 		else

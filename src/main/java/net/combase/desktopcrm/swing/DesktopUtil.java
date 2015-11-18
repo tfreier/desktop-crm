@@ -34,7 +34,7 @@ public class DesktopUtil {
 	private static void open(URI uri)
 	{
 		if (open("kde-open", uri) || open("gnome-open", uri) || open("open", uri) ||
-			open("xdg-open", uri) || open("explorer", uri))
+			open("xdg-open", uri) || open("explorer", uri) || open("kde-open", uri))
 			return;
 
 		System.err.println("no open command worked for " + uri.toString());
@@ -60,18 +60,6 @@ public class DesktopUtil {
 
 	public static void openBrowser(String url)
 	{
-		if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Action.BROWSE))
-		try
-		{
-			Desktop.getDesktop().browse(new URI(url));
-
-			return;
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			}
-
 		try
 		{
 			open(new URI(url));

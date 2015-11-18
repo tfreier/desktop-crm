@@ -13,4 +13,10 @@ public class Opportunity extends AbstractCrmObject {
 		super(id, title);
 	}
 
+	@Override
+	public String getCrmEntityType()
+	{
+		return "Opportunities";
+	}
+
 }

@@ -52,4 +52,11 @@ public class EmailTemplate extends AbstractCrmObject {
 	}
 
 
+	@Override
+	public String getCrmEntityType()
+	{
+		return "EmailTemplates";
+	}
+
+
 }

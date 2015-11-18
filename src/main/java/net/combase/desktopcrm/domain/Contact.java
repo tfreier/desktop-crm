@@ -16,5 +16,11 @@ public class Contact extends Lead
 		super(id, title);
 	}
 
+	@Override
+	public String getCrmEntityType()
+	{
+		return "Contacts";
+	}
+
 
 }
