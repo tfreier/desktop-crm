@@ -147,7 +147,9 @@ public final class AsteriskManager
 	private static boolean isValid(String number)
 	{
 		return number != null && number.length() > 5 && !number.startsWith("record") &&
-			!number.startsWith("monitor");
+			!number.startsWith("monitor") && !number.startsWith("agent") &&
+			!number.startsWith("state") && !number.startsWith("STARTMEETME") &&
+			!number.startsWith("recconf");
 	}
 
 	public static void addListener(AsteriskCallEventListener l)
