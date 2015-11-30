@@ -16,6 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import net.combase.desktopcrm.data.CrmManager;
@@ -55,7 +56,9 @@ public class CallWindow extends JFrame
 
 		text = new JTextArea();
 		text.setText("\n\nCalled via " + number);
-		main.add(text, BorderLayout.CENTER);
+		text.setLineWrap(true);
+		text.setWrapStyleWord(true);
+		main.add(new JScrollPane(text), BorderLayout.CENTER);
 
 
 		JPanel top = new JPanel();
