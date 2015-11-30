@@ -29,15 +29,18 @@ import ch.swingfx.twinkle.window.Positions;
  * @author till
  *
  */
-public class DesktopUtil {
+public class DesktopUtil
+{
 
-	private static void open(URI uri)
+	private static boolean open(URI uri)
 	{
 		if (open("kde-open", uri) || open("gnome-open", uri) || open("open", uri) ||
 			open("xdg-open", uri) || open("explorer", uri) || open("kde-open", uri))
-			return;
+			return true;
 
 		System.err.println("no open command worked for " + uri.toString());
+
+		return false;
 	}
 
 	private static boolean open(String util, URI uri)
@@ -62,7 +65,19 @@ public class DesktopUtil {
 	{
 		try
 		{
-			open(new URI(url));
+			URI uri = new URI(url);
+			if (!open(uri) && Desktop.isDesktopSupported() &&
+				Desktop.getDesktop().isSupported(Action.BROWSE))
+				try
+				{
+					Desktop.getDesktop().browse(uri);
+
+					return;
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
 		}
 		catch (URISyntaxException e)
 		{
@@ -147,7 +162,7 @@ public class DesktopUtil {
 		open(uri);
 
 	}
-	
+
 	public static NotificationBuilder createNotificationBuilder()
 	{
 		NotificationBuilder nb = new NotificationBuilder();
@@ -158,7 +173,7 @@ public class DesktopUtil {
 		nb.withFadeOutAnimation(true);
 		nb.withPosition(Positions.NORTH_EAST);
 		nb.withDisplayTime(10000);
-		
+
 		return nb;
 	}
 }
