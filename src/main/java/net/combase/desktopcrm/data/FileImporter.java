@@ -36,6 +36,12 @@ public class FileImporter
 
 			Lead lead = new Lead(null, "new lead");
 			StringBuilder desc = new StringBuilder();
+
+			// use capterra as default campaign since it doesn't reference itself in the import file
+			Campaign camp = CrmManager.getCampaignByName("Capterra");
+			if (camp != null)
+				lead.setCampaignId(camp.getId());
+
 			while (header.hasNext() && content.hasNext())
 			{
 				String key = header.next();
@@ -45,10 +51,11 @@ public class FileImporter
 				switch (key)
 				{
 					case "Campaign Code" :
-						Campaign camp = CrmManager.getCampaignByName(value);
+						camp = CrmManager.getCampaignByName(value);
 						if (camp != null)
 							lead.setCampaignId(camp.getId());
 						break;
+					case "Organization" :
 					case "Company" :
 						lead.setAccountName(value);
 						break;
@@ -59,6 +66,7 @@ public class FileImporter
 						desc.append("Size: ").append(value).append("\n");
 						break;
 					case "Size 2" :
+					case "# of Employees" :
 						desc.append("Staff: ").append(value).append("\n");
 						break;
 					case "Size 3" :
@@ -71,13 +79,57 @@ public class FileImporter
 						desc.append("Deployment: ").append(value).append("\n");
 						break;
 					case "Call Notes" :
+					case "Problem Buyer Needs to Solve" :
 						desc.append("\n\nCALL NOTES\n\n").append(value).append("\n\n");
 						break;
+					case "Budget Details" :
+						desc.append("\n\nBudget Details\n\n").append(value).append("\n\n");
+					case "Buyer's Requirements" :
+						desc.append("\n\nBudget Details\n\n").append(value).append("\n\n");
+						break;
 					case "Timeframe" :
+					case "Purchase Timeframe" :
 						desc.append("Timeframe: ").append(value).append("\n");
 						break;
+					case "Stage in Buying Process" :
+						desc.append("Stage in Buying Process: ").append(value).append("\n");
+						break;
 					case "Product" :
+					case "Type of Software Needed" :
 						desc.append("Product: ").append(value).append("\n");
+						break;
+					case "Current Software" :
+						desc.append("Current Software: ").append(value).append("\n");
+						break;
+					case "Buyer Has Budget" :
+						desc.append("Buyer Has Budget: ").append(value).append("\n");
+						break;
+					case "Budget Amount" :
+						desc.append("Budget Amount: ").append(value).append("\n");
+						break;
+					case "Decision Maker" :
+						desc.append("Decision Maker: ").append(value).append("\n");
+						break;
+					case "Name" :
+						String[] split = value.split(" ");
+						if (split.length < 2)
+							lead.setLastName(value);
+						else
+						{
+							lead.setFirstname(split[0]);
+							int i = 0;
+							StringBuilder sb = new StringBuilder();
+							for (String string : split)
+							{
+								i++;
+								if (i == 1)
+									continue;
+								sb.append(string);
+								if (i < split.length)
+									sb.append(' ');
+							}
+							lead.setLastName(sb.toString());
+						}
 						break;
 					case "First Name" :
 						lead.setFirstname(value);
@@ -107,6 +159,7 @@ public class FileImporter
 						lead.setZip(value);
 						break;
 					case "Country" :
+					case "Location" :
 						lead.setCountry(value);
 						break;
 					case "Request" :

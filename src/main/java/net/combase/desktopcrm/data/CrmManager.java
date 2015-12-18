@@ -985,6 +985,27 @@ public class CrmManager
 		{
 			String result = api.setBean(session, b);
 
+			if (l.getCampaignId() != null && l.getId() == null)
+			{
+				api.setRelationsship(session, "Campaigns", l.getCampaignId(), "leads", result,
+					false);
+
+				SugarBean log = new SugarBean("CampaignLog");
+				log.set("campaign_id", l.getCampaignId());
+				log.set("related_id", result);
+				log.set("related_type", "Leads");
+				log.set("activity_type", "lead");
+				log.set("target_type", "Leads");
+				log.set("activity_date", formatter.print(new DateTime().minusHours(gmtOffset)));
+				log.set("target_id", result);
+				log.set("marketing_id", "DesktopCRM Import");
+				log.set("more_information", "DesktopCRM Import");
+
+				String logResult = api.setBean(session, log);
+
+				System.out.println("CampaingLog Result: " + logResult);
+			}
+
 			return getLead(result);
 		}
 		catch (SugarApiException e)
