@@ -59,11 +59,12 @@ public final class CrmHelper
 		if (DataStoreManager.getSettings().isCaseReminder())
 			checkList.addAll(CrmManager.getCaseList());
 
+		if (DataStoreManager.getSettings().isOpportunityReminder())
+			checkList.addAll(CrmManager.getOpportunityList());
+
 		if (DataStoreManager.getSettings().isLeadReminder())
 			checkList.addAll(CrmManager.getLeadList());
 
-		if (DataStoreManager.getSettings().isOpportunityReminder())
-			checkList.addAll(CrmManager.getOpportunityList());
 
 		for (final AbstractCrmObject lead : checkList)
 		{
@@ -87,5 +88,25 @@ public final class CrmHelper
 			noAction = CrmManager.getCallListByParent(lead.getId()).isEmpty();
 
 		return !noAction;
+	}
+
+
+	public static List<AbstractCrmObject> getGlobalActionObjects()
+	{
+		List<AbstractCrmObject> result = new ArrayList<>();
+		List<AbstractCrmObject> checkList = new ArrayList<>();
+
+		checkList.addAll(CrmManager.getGlobalCaseList());
+		checkList.addAll(CrmManager.getGlobalOpportunityList());
+		checkList.addAll(CrmManager.getGlobalLeadList());
+
+		for (final AbstractCrmObject lead : checkList)
+		{
+			System.out.println("check " + lead.getTitle() + " for actions.");
+			if (!hasActionsPlanned(lead))
+				result.add(lead);
+		}
+		System.out.println("found " + result.size() + " action items.");
+		return result;
 	}
 }

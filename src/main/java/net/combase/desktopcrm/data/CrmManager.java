@@ -12,19 +12,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.combase.desktopcrm.domain.AbstractCrmObject;
-import net.combase.desktopcrm.domain.Account;
-import net.combase.desktopcrm.domain.Call;
-import net.combase.desktopcrm.domain.CallType;
-import net.combase.desktopcrm.domain.Campaign;
-import net.combase.desktopcrm.domain.Case;
-import net.combase.desktopcrm.domain.Contact;
-import net.combase.desktopcrm.domain.EmailTemplate;
-import net.combase.desktopcrm.domain.Lead;
-import net.combase.desktopcrm.domain.Opportunity;
-import net.combase.desktopcrm.domain.Settings;
-import net.combase.desktopcrm.domain.Task;
-
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -38,6 +25,19 @@ import com.sugarcrm.api.SugarEntity;
 import com.sugarcrm.api.SugarSession;
 import com.sugarcrm.api.v4.impl.SugarApi;
 import com.sugarcrm.api.v4.impl.SugarBean;
+
+import net.combase.desktopcrm.domain.AbstractCrmObject;
+import net.combase.desktopcrm.domain.Account;
+import net.combase.desktopcrm.domain.Call;
+import net.combase.desktopcrm.domain.CallType;
+import net.combase.desktopcrm.domain.Campaign;
+import net.combase.desktopcrm.domain.Case;
+import net.combase.desktopcrm.domain.Contact;
+import net.combase.desktopcrm.domain.EmailTemplate;
+import net.combase.desktopcrm.domain.Lead;
+import net.combase.desktopcrm.domain.Opportunity;
+import net.combase.desktopcrm.domain.Settings;
+import net.combase.desktopcrm.domain.Task;
 
 /**
  * @author till
@@ -321,7 +321,7 @@ public class CrmManager
 	public static List<Call> getCallListByParent(String parentId)
 	{
 		String moduleName = "Calls";
-		String query = "calls.status<>'Planned' and calls.parent_id='" + parentId + "'";
+		String query = "calls.status='Planned' and calls.parent_id='" + parentId + "'";
 
 
 		Collection<Call> collection = loadCrmObjects(CALL_CREATOR, moduleName, query);
@@ -479,6 +479,7 @@ public class CrmManager
 		return collection;
 	}
 
+
 	public static Collection<Case> findCase(String search)
 	{
 		if (search == null || search.trim().isEmpty())
@@ -540,6 +541,21 @@ public class CrmManager
 		return new ArrayList<>(collection);
 	}
 
+
+	public static List<Lead> getGlobalLeadList()
+	{
+		if (!checkSetup())
+			return new ArrayList<>();
+
+		String moduleName = "Leads";
+		String query = "leads.status<>'Dead' and leads.status<>'dead' and leads.status<>'converted' and leads.status<>'Converted' and" + " leads.converted=0";
+
+		Collection<Lead> collection = loadCrmObjects(LEAD_CREATOR, moduleName, query, "leads.date_entered DESC");
+
+		return new ArrayList<>(collection);
+	}
+
+
 	public static List<EmailTemplate> getEmailTemplateList()
 	{
 		if (!checkSetup())
@@ -574,6 +590,20 @@ public class CrmManager
 	}
 
 
+	public static List<Case> getGlobalCaseList()
+	{
+		if (!checkSetup())
+			return new ArrayList<>();
+
+		String moduleName = "Cases";
+		String query = "cases.state<>'Closed' and cases.state<>'closed'";
+
+		Collection<Case> collection = loadCrmObjects(CASE_CREATOR, moduleName, query);
+
+		return new ArrayList<>(collection);
+	}
+
+
 	public static List<Opportunity> getOpportunityList()
 	{
 		if (!checkSetup())
@@ -589,6 +619,22 @@ public class CrmManager
 
 		return new ArrayList<>(collection);
 	}
+
+
+	public static List<Opportunity> getGlobalOpportunityList()
+	{
+		if (!checkSetup())
+			return new ArrayList<>();
+
+		String moduleName = "Opportunities";
+		String userId = session.getUser().getUserId();
+		String query = "opportunities.sales_stage not like 'Closed%' and opportunities.sales_stage not like 'closed%'";
+
+		Collection<Opportunity> collection = loadCrmObjects(OPPORTUNITY_CREATOR, moduleName, query);
+
+		return new ArrayList<>(collection);
+	}
+
 
 	public static Collection<Opportunity> getOpportunityListByAccount(String accountId)
 	{
@@ -724,6 +770,7 @@ public class CrmManager
 		String id = entity.getId();
 		final T t = creator.createObject(id, entity.get("name"));
 		t.setViewUrl(createObjectUrl(moduleName, id));
+		t.setAssignedUser(entity.get("assigned_user_name"));
 		creator.prepare(t, entity);
 		return t;
 	}
@@ -942,6 +989,7 @@ public class CrmManager
 	private static <T extends AbstractCrmObject> T loadCrmObject(String id,
 		final String moduleName, CrmObjectCreator<T> creator)
 	{
+		checkSetup();
 		try
 		{
 			SugarEntity bean = api.getBean(session, moduleName, id);

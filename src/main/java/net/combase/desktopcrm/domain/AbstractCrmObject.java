@@ -16,6 +16,19 @@ public abstract class AbstractCrmObject
 	private String relatedObjectId;
 	private String title;
 
+	private String assignedUser;
+
+
+	public String getAssignedUser()
+	{
+		return assignedUser;
+	}
+
+
+	public void setAssignedUser(String assignedUser)
+	{
+		this.assignedUser = assignedUser;
+	}
 
 	public abstract String getCrmEntityType();
 

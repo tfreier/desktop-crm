@@ -27,11 +27,11 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
+import org.apache.commons.io.IOUtils;
+
 import net.combase.desktopcrm.data.FileImporter;
 import net.combase.desktopcrm.domain.Lead;
 import net.combase.desktopcrm.swing.DataSelectionEventManager.DataSelectionActivationListener;
-
-import org.apache.commons.io.IOUtils;
 
 public class SwingWindow
 {
@@ -139,6 +139,7 @@ public class SwingWindow
 
 		tabbedPane.addTab("Tasks", CrmIcons.DONE, new TaskTablePanel());
 		tabbedPane.addTab("Calls", CrmIcons.CALL, new CallTablePanel());
+		tabbedPane.addTab("Action Required", CrmIcons.RECHEDULE, new ActionRequiredTablePanel());
 		tabbedPane.addTab("Cases", CrmIcons.WARN, new CaseTablePanel());
 		tabbedPane.addTab("Leads", CrmIcons.USER, new LeadTablePanel());
 		tabbedPane.addTab("Search", CrmIcons.VIEW, new SearchTablePanel());

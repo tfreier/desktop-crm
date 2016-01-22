@@ -25,23 +25,24 @@ import ch.swingfx.twinkle.style.closebutton.NullCloseButton;
 import ch.swingfx.twinkle.style.theme.LightDefaultNotification;
 import ch.swingfx.twinkle.window.Positions;
 
+
+
 /**
  * @author till
- *
  */
 public class DesktopUtil
 {
 
 	private static boolean open(URI uri)
 	{
-		if (open("kde-open", uri) || open("gnome-open", uri) || open("open", uri) ||
-			open("xdg-open", uri) || open("explorer", uri) || open("kde-open", uri))
+		if (open("kde-open", uri) || open("gnome-open", uri) || open("open", uri) || open("xdg-open", uri) || open("kde-open", uri))
 			return true;
 
 		System.err.println("no open command worked for " + uri.toString());
 
 		return false;
 	}
+
 
 	private static boolean open(String util, URI uri)
 	{
@@ -61,13 +62,13 @@ public class DesktopUtil
 		return false;
 	}
 
+
 	public static void openBrowser(String url)
 	{
 		try
 		{
 			URI uri = new URI(url);
-			if (!open(uri) && Desktop.isDesktopSupported() &&
-				Desktop.getDesktop().isSupported(Action.BROWSE))
+			if (!open(uri) && Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Action.BROWSE))
 				try
 				{
 					Desktop.getDesktop().browse(uri);
@@ -91,7 +92,8 @@ public class DesktopUtil
 		try
 		{
 			Message message = new MimeMessage(Session.getInstance(System.getProperties()));
-			// message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+			// message.setRecipients(Message.RecipientType.TO,
+			// InternetAddress.parse(to));
 			message.setSubject(subject);
 			// create the message part
 			MimeBodyPart content = new MimeBodyPart();
@@ -100,11 +102,13 @@ public class DesktopUtil
 			Multipart multipart = new MimeMultipart();
 			multipart.addBodyPart(content);
 			// add attachments
-/*
- * for (File file : attachments) { MimeBodyPart attachment = new MimeBodyPart(); DataSource source =
- * new FileDataSource(file); attachment.setDataHandler(new DataHandler(source));
- * attachment.setFileName(file.getName()); multipart.addBodyPart(attachment); }
- */
+			/*
+			 * for (File file : attachments) { MimeBodyPart attachment = new
+			 * MimeBodyPart(); DataSource source = new FileDataSource(file);
+			 * attachment.setDataHandler(new DataHandler(source));
+			 * attachment.setFileName(file.getName());
+			 * multipart.addBodyPart(attachment); }
+			 */
 			// integration
 			message.setContent(multipart);
 			// store file
@@ -120,10 +124,12 @@ public class DesktopUtil
 
 	}
 
+
 	public static void openEmail(String mailTo, String subject)
 	{
 		openEmail(mailTo, subject, "");
 	}
+
 
 	public static void openEmail(String mailTo, String subject, String body)
 	{
@@ -162,6 +168,7 @@ public class DesktopUtil
 		open(uri);
 
 	}
+
 
 	public static NotificationBuilder createNotificationBuilder()
 	{

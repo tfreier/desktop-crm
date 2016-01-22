@@ -74,7 +74,11 @@ public class SugarBean extends SugarBeanReference implements com.sugarcrm.api.Su
 	@Override
 	public String get(final String fieldName)
 	{
-		return this.values.get(fieldName).get("value");
+		HashMap<String, String> hashMap = this.values.get(fieldName);
+		if (hashMap == null)
+			return null;
+
+		return hashMap.get("value");
 	}
 
 
