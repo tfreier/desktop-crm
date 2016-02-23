@@ -34,13 +34,15 @@ public class CrmSettings extends JFrame {
 	private JTextField asteriskHostField;
 	private JTextField extensionField;
 
+	private JTextField dialUrlField;
+
 
 	/**
 	 * Create the frame.
 	 */
 	public CrmSettings() {
 		setTitle("CRM Settings");
-		setBounds(100, 100, 449, 390);
+		setBounds(100, 100, 449, 420);
 		setResizable(false);
 		setIconImage(CrmIcons.SETTINGS.getImage());
 		contentPane = new JPanel();
@@ -82,7 +84,7 @@ public class CrmSettings extends JFrame {
 				onSave();
 			}
 		});
-		btnSave.setBounds(308, 310, 117, 25);
+		btnSave.setBounds(308, 347, 117, 25);
 		contentPane.add(btnSave);
 		
 
@@ -138,9 +140,18 @@ public class CrmSettings extends JFrame {
 		extensionField.setColumns(10);
 		extensionField.setText(settings.getAsteriskExtension());
 
+		dialUrlField = new JTextField();
+		dialUrlField.setBounds(139, 301, 279, 25);
+		contentPane.add(dialUrlField);
+		dialUrlField.setText(settings.getDialUrl());
+
 		JLabel lblExtension = new JLabel("Extension");
-		lblExtension.setBounds(12, 264, 70, 15);
+		lblExtension.setBounds(15, 264, 70, 15);
 		contentPane.add(lblExtension);
+
+		JLabel dialUrl = new JLabel("Dial URL");
+		dialUrl.setBounds(15, 301, 70, 15);
+		contentPane.add(dialUrl);
 	}
 
 
@@ -154,6 +165,7 @@ public class CrmSettings extends JFrame {
 		String asteriskUser = asteriskManagerField.getText();
 		String asteriskPassword = asteriskPasswordField.getText();
 		String asteriskExtension = extensionField.getText();
+		String dialUrl = dialUrlField.getText();
 		
 		Settings settings = DataStoreManager.getSettings();
 		settings.setCrmUrl(url);
@@ -165,6 +177,7 @@ public class CrmSettings extends JFrame {
 		settings.setAsteriskHost(asteriskHost);
 		settings.setAsteriskPassword(asteriskPassword);
 		settings.setAsteriskUser(asteriskUser);
+		settings.setDialUrl(dialUrl);
 		
 		DataStoreManager.writeSettings(settings);
 		

@@ -81,6 +81,8 @@ public class SearchTablePanel extends JPanel
 
 		table.getColumnModel().getColumn(0).setMaxWidth(100);
 		table.getColumnModel().getColumn(2).setMaxWidth(30);
+		table.getColumnModel().getColumn(3).setMaxWidth(30);
+		table.getColumnModel().getColumn(4).setMaxWidth(30);
 		table.setRowHeight(30);
 
 		final JTextField searchField = new JTextField();

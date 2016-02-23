@@ -78,6 +78,7 @@ public class LeadTablePanel extends JPanel
 
 		table.getColumnModel().getColumn(1).setMaxWidth(30);
 		table.getColumnModel().getColumn(2).setMaxWidth(30);
+		table.getColumnModel().getColumn(3).setMaxWidth(30);
 		table.setRowHeight(30);
 
 		add(table.getTableHeader(), BorderLayout.NORTH);

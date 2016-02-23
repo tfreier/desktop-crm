@@ -14,14 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
-import net.combase.desktopcrm.data.CrmManager;
-import net.combase.desktopcrm.data.DataStoreManager;
-import net.combase.desktopcrm.domain.Case;
-import net.combase.desktopcrm.domain.Contact;
-import net.combase.desktopcrm.domain.HasEmail;
-import net.combase.desktopcrm.domain.Lead;
-import net.combase.desktopcrm.domain.Task;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
@@ -29,6 +21,14 @@ import org.joda.time.LocalDate;
 import ch.swingfx.twinkle.event.NotificationEvent;
 import ch.swingfx.twinkle.event.NotificationEventAdapter;
 import ch.swingfx.twinkle.window.Positions;
+import net.combase.desktopcrm.data.AsteriskManager;
+import net.combase.desktopcrm.data.CrmManager;
+import net.combase.desktopcrm.data.DataStoreManager;
+import net.combase.desktopcrm.domain.Case;
+import net.combase.desktopcrm.domain.Contact;
+import net.combase.desktopcrm.domain.HasEmail;
+import net.combase.desktopcrm.domain.Lead;
+import net.combase.desktopcrm.domain.Task;
 
 /**
  * @author "Till Freier"
@@ -45,9 +45,10 @@ public class TaskTableModel extends AbstractTableModel
 	 * 
 	 */
 	private static final long serialVersionUID = -3890791456083674319L;
-	private static final String[] COLUMN_NAMES = new String[] { "Task", "Due", "", "", "", "", "" };
+
+	private static final String[] COLUMN_NAMES = new String[] { "Task", "Due", "", "", "", "", "", "" };
 	private static final Class<?>[] COLUMN_TYPES = new Class<?>[] { String.class, String.class,
-			JButton.class, JButton.class, JButton.class, JButton.class, JButton.class };
+ JButton.class, JButton.class, JButton.class, JButton.class, JButton.class, JButton.class };
 
 	private final List<Task> data;
 
@@ -149,10 +150,12 @@ public class TaskTableModel extends AbstractTableModel
 			case 3 :
 				return createViewButton(task);
 			case 4 :
-				return createRescheduleButton(task);
-			case 5 :
 				return createMessageButton(task);
-			case 6 :
+			case 5:
+				return createCallButton(task);
+			case 6:
+				return createRescheduleButton(task);
+			case 7:
 				return createDoneButton(task);
 
 			default :
@@ -309,6 +312,64 @@ public class TaskTableModel extends AbstractTableModel
 
 		return button;
 	}
+
+
+	private JButton createCallButton(final Task task)
+	{
+		final JButton button = new JButton();
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				String name = "";
+				String no = null;
+				switch (task.getParentType())
+				{
+					case "Leads":
+						Lead lead = CrmManager.getLead(task.getParentId());
+						if (lead == null)
+							break;
+						name = lead.getTitle();
+						no = lead.getPhone();
+					case "Contacts":
+						Contact c = CrmManager.getContact(task.getParentId());
+						if (c == null)
+							break;
+						name = c.getTitle();
+						no = c.getPhone();
+					case "Opportunities":
+						Collection<Contact> contacts = CrmManager.getContactListByOpportunity(task.getParentId());
+						if (contacts != null && !contacts.isEmpty())
+						{
+							Contact next = contacts.iterator().next();
+							name = next.getTitle();
+							no = next.getPhone();
+						}
+					default:
+						break;
+				}
+				if (no == null || no.trim().isEmpty())
+					JOptionPane.showMessageDialog(null, "No number found.");
+
+				AsteriskManager.dial(no);
+			}
+		});
+
+		button.setBackground(new Color(90, 90, 90, ALPHA));
+
+		button.setIcon(CrmIcons.CALL);
+
+		if (task.getParentId() == null || task.getParentId().trim().isEmpty())
+		{
+			button.setVisible(false);
+			button.setEnabled(false);
+		}
+
+		button.setToolTipText("Call");
+
+		return button;
+	}
+
 
 	private JButton createMessageButton(final Task task)
 	{

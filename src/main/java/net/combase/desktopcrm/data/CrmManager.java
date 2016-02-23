@@ -170,8 +170,7 @@ public class CrmManager
 		@Override
 		public void prepare(Contact obj, SugarEntity bean)
 		{
-			obj.setEmail(bean.get("email1"));
-			obj.setFirstname(bean.get("first_name"));
+			LEAD_CREATOR.prepare(obj, bean);
 		}
 
 	};
@@ -997,7 +996,7 @@ public class CrmManager
 			return convertEntity(creator, moduleName, bean);
 
 		}
-		catch (SugarApiException e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}

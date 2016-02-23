@@ -7,12 +7,15 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.table.AbstractTableModel;
 
+import net.combase.desktopcrm.data.AsteriskManager;
 import net.combase.desktopcrm.domain.AbstractCrmObject;
+import net.combase.desktopcrm.domain.Lead;
 
 /**
  * @author "Till Freier"
@@ -25,9 +28,9 @@ public class SearchTableModel extends AbstractTableModel
 	 */
 	private static final long serialVersionUID = -8394157828871760312L;
 
-	private static final String[] COLUMN_NAMES = new String[] { "Type", "Name", "" };
+	private static final String[] COLUMN_NAMES = new String[] { "Type", "Name", "", "", "" };
 	private static final Class<?>[] COLUMN_TYPES = new Class<?>[] { String.class, String.class,
-			JButton.class };
+ JButton.class, JButton.class, JButton.class };
 
 	private final List<AbstractCrmObject> data;
 
@@ -71,6 +74,10 @@ public class SearchTableModel extends AbstractTableModel
 				return task.getTitle();
 			case 2 :
 				return createViewButton(task);
+			case 3:
+				return createEmailButton(task);
+			case 4:
+				return createCallButton(task);
 
 			default :
 				return "Error";
@@ -95,6 +102,65 @@ public class SearchTableModel extends AbstractTableModel
 		button.setBackground(new Color(90, 115, 255, 100));
 		button.setIcon(CrmIcons.VIEW);
 		button.setToolTipText("View " + task.getClass().getSimpleName());
+
+		return button;
+	}
+
+
+	private JButton createCallButton(final AbstractCrmObject task)
+	{
+		String no = null;
+
+		if (task instanceof Lead)
+		{
+			Lead lead = (Lead) task;
+			no = lead.getPhone();
+		}
+
+		final JButton button = new JButton();
+		final String number = no;
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				AsteriskManager.dial(number);
+			}
+		});
+
+		button.setEnabled(no != null && !no.isEmpty());
+
+		button.setBackground(new Color(90, 90, 90, 100));
+		button.setIcon(CrmIcons.CALL);
+		button.setToolTipText("Call " + task.getClass().getSimpleName());
+
+		return button;
+	}
+
+
+	private JButton createEmailButton(final AbstractCrmObject task)
+	{
+		String mail = null;
+
+		if (task instanceof Lead)
+		{
+			Lead lead = (Lead) task;
+			mail = lead.getEmail();
+		}
+
+		final JButton button = new JButton();
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				SendEmailDialog.sendEmail(null, "", Arrays.asList((Lead) task));
+			}
+		});
+
+		button.setEnabled(mail != null && !mail.isEmpty());
+
+		button.setBackground(new Color(255, 255, 255, 100));
+		button.setIcon(CrmIcons.MAIL);
+		button.setToolTipText("email " + task.getClass().getSimpleName());
 
 		return button;
 	}

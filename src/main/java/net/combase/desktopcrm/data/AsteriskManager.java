@@ -5,11 +5,19 @@ package net.combase.desktopcrm.data;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.combase.desktopcrm.domain.Settings;
-
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.asteriskjava.live.AsteriskChannel;
 import org.asteriskjava.live.AsteriskServer;
 import org.asteriskjava.live.AsteriskServerListener;
@@ -19,9 +27,15 @@ import org.asteriskjava.live.Extension;
 import org.asteriskjava.live.ManagerCommunicationException;
 import org.asteriskjava.live.MeetMeUser;
 
+import net.combase.desktopcrm.domain.Settings;
+
+
+
 /**
+ * yealink call url:
+ * http://10.1.0.11/cgi-bin/ConfigManApp.com?number=702-927-6689
+ * 
  * @author "Till Freier"
- *
  */
 public final class AsteriskManager
 {
@@ -42,6 +56,47 @@ public final class AsteriskManager
 	private AsteriskManager()
 	{
 		super();
+	}
+
+
+	public static void dial(String number)
+	{
+		final Settings settings = DataStoreManager.getSettings();
+		String dialUrl = settings.getDialUrl();
+
+		if (dialUrl == null || dialUrl.trim().isEmpty())
+		{
+			System.out.println("no dial url configured");
+			return;
+		}
+
+		number = number.replaceAll("[^0-9]*", "");
+
+		String urlStr = dialUrl.replaceAll("\\$0", number);
+		System.out.println("dial url: " + urlStr);
+		try
+		{
+			HttpGet get = new HttpGet(urlStr);
+			CredentialsProvider provider = new BasicCredentialsProvider();
+			UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "admin");
+			provider.setCredentials(AuthScope.ANY, credentials);
+			HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+
+			HttpResponse response = client.execute(get);
+			int statusCode = response.getStatusLine().getStatusCode();
+			System.out.println("url call status code: " + statusCode);
+		}
+		catch (ClientProtocolException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 
@@ -146,10 +201,12 @@ public final class AsteriskManager
 
 	private static boolean isValid(String number)
 	{
-		return number != null && number.length() > 5 && !number.startsWith("record") &&
-			!number.startsWith("monitor") && !number.startsWith("agent") &&
-			!number.startsWith("state") && !number.startsWith("STARTMEETME") &&
-			!number.startsWith("recconf");
+		if (number != null && number.matches("^[0-9]*$") && number.length() > 5)
+			return true;
+
+		System.out.println("ignore call " + number);
+
+		return false;
 	}
 
 	public static void addListener(AsteriskCallEventListener l)

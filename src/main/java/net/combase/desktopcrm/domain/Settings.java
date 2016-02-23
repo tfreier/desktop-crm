@@ -25,12 +25,25 @@ public class Settings implements Serializable
 	private String asteriskPassword;
 	private String asteriskExtension;
 
+	private String dialUrl;
+
 	private boolean callReminder = true;
 	private boolean taskReminder = true;
 	private boolean leadReminder = true;
 	private boolean opportunityReminder = true;
 	private boolean caseReminder = true;
 
+
+	public String getDialUrl()
+	{
+		return dialUrl;
+	}
+
+
+	public void setDialUrl(String dialUrl)
+	{
+		this.dialUrl = dialUrl;
+	}
 
 	public String getAsteriskHost()
 	{

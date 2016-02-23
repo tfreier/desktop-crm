@@ -13,6 +13,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.table.AbstractTableModel;
 
+import net.combase.desktopcrm.data.AsteriskManager;
 import net.combase.desktopcrm.domain.Lead;
 
 /**
@@ -25,8 +26,10 @@ public class LeadTableModel extends AbstractTableModel
 	 * 
 	 */
 	private static final long serialVersionUID = -3890791456083674319L;
-	private static final String[] COLUMN_NAMES = new String[] { "Lead", "", "" };
-	private static final Class<?>[] COLUMN_TYPES = new Class<?>[] { String.class, JButton.class,
+
+	private static final String[] COLUMN_NAMES = new String[] { "Lead", "", "", "" };
+
+	private static final Class<?>[] COLUMN_TYPES = new Class<?>[] { String.class, JButton.class, JButton.class,
 			JButton.class };
 
 	private final List<Lead> data;
@@ -71,6 +74,8 @@ public class LeadTableModel extends AbstractTableModel
 				return createViewButton(task);
 			case 2 :
 				return createEmailButton(task);
+			case 3:
+				return createCallButton(task);
 
 			default :
 				return "Error";
@@ -95,6 +100,25 @@ public class LeadTableModel extends AbstractTableModel
 		button.setBackground(new Color(255, 255, 255, 100));
 		button.setIcon(CrmIcons.MAIL);
 		button.setToolTipText("Send email...");
+
+		return button;
+	}
+
+
+	private JButton createCallButton(final Lead task)
+	{
+		final JButton button = new JButton();
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				AsteriskManager.dial(task.getPhone());
+			}
+		});
+
+		button.setBackground(new Color(90, 90, 90, 100));
+		button.setIcon(CrmIcons.CALL);
+		button.setToolTipText("Call " + task.getPhone());
 
 		return button;
 	}
