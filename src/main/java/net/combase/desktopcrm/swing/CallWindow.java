@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Collection;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,13 +20,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import org.joda.time.DateTime;
+
 import net.combase.desktopcrm.data.CrmManager;
 import net.combase.desktopcrm.domain.AbstractCrmObject;
 import net.combase.desktopcrm.domain.Call;
 import net.combase.desktopcrm.domain.CallType;
+import net.combase.desktopcrm.domain.Contact;
+import net.combase.desktopcrm.domain.Opportunity;
 import net.combase.desktopcrm.swing.DataSelectionEventManager.DataSelectionListener;
-
-import org.joda.time.DateTime;
 
 /**
  * @author "Till Freier"
@@ -196,8 +199,18 @@ public class CallWindow extends JFrame
 	private void setContact(String number)
 	{
 		contact = CrmManager.getContactByNumber(number);
-		if (contact == null)
-			CrmManager.getLeadByNumber(number);
+		if (contact != null)
+		{
+			final String accountId = ((Contact) contact).getAccountId();
+			Collection<Opportunity> list = CrmManager.getOpportunityListByAccount(accountId);
+			for (Opportunity opportunity : list)
+			{
+				contact = opportunity;
+			}
+
+		}
+		else
+			contact = CrmManager.getLeadByNumber(number);
 
 		if (contact != null)
 			setTitle("Call with " + contact.getTitle());

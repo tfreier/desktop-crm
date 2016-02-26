@@ -131,7 +131,7 @@ public class SearchTableModel extends AbstractTableModel
 
 		button.setBackground(new Color(90, 90, 90, 100));
 		button.setIcon(CrmIcons.CALL);
-		button.setToolTipText("Call " + task.getClass().getSimpleName());
+		button.setToolTipText("Call " + no);
 
 		return button;
 	}

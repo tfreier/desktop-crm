@@ -10,6 +10,8 @@ package net.combase.desktopcrm.domain;
  */
 public class Contact extends Lead
 {
+	private String accountId;
+
 
 	public Contact(String id, String title)
 	{
@@ -22,5 +24,16 @@ public class Contact extends Lead
 		return "Contacts";
 	}
 
+
+	public String getAccountId()
+	{
+		return accountId;
+	}
+
+
+	public void setAccountId(String accountId)
+	{
+		this.accountId = accountId;
+	}
 
 }

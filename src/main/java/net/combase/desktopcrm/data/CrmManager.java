@@ -171,6 +171,8 @@ public class CrmManager
 		public void prepare(Contact obj, SugarEntity bean)
 		{
 			LEAD_CREATOR.prepare(obj, bean);
+
+			obj.setAccountId(bean.get("account_id"));
 		}
 
 	};
