@@ -217,6 +217,7 @@ public class SwingWindow
 					{
 						evt.acceptDrop(java.awt.dnd.DnDConstants.ACTION_COPY);
 
+						@SuppressWarnings("unchecked")
 						List<File> fileList = (List<File>)tr.getTransferData(java.awt.datatransfer.DataFlavor.javaFileListFlavor);
 						for (File file : fileList)
 						{

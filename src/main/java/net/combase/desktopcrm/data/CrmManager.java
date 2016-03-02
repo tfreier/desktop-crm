@@ -628,7 +628,6 @@ public class CrmManager
 			return new ArrayList<>();
 
 		String moduleName = "Opportunities";
-		String userId = session.getUser().getUserId();
 		String query = "opportunities.sales_stage not like 'Closed%' and opportunities.sales_stage not like 'closed%'";
 
 		Collection<Opportunity> collection = loadCrmObjects(OPPORTUNITY_CREATOR, moduleName, query);

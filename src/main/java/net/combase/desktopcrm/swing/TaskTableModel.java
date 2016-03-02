@@ -349,7 +349,7 @@ public class TaskTableModel extends AbstractTableModel
 						break;
 				}
 				if (no == null || no.trim().isEmpty())
-					JOptionPane.showMessageDialog(null, "No number found.");
+					JOptionPane.showMessageDialog(null, "No number found for " + name);
 
 				AsteriskManager.dial(no);
 			}
