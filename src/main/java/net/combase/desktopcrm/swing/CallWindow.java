@@ -4,6 +4,7 @@
 package net.combase.desktopcrm.swing;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -30,9 +31,10 @@ import net.combase.desktopcrm.domain.Contact;
 import net.combase.desktopcrm.domain.Opportunity;
 import net.combase.desktopcrm.swing.DataSelectionEventManager.DataSelectionListener;
 
+
+
 /**
  * @author "Till Freier"
- *
  */
 public class CallWindow extends JFrame
 {
@@ -41,10 +43,15 @@ public class CallWindow extends JFrame
 	 * 
 	 */
 	private static final long serialVersionUID = -601570990578198225L;
+
 	private AbstractCrmObject contact;
+
 	private DateTime start = new DateTime();
+
 	private JTextArea text;
+
 	private final CallType type;
+
 
 	public CallWindow(String number, CallType type)
 	{
@@ -63,21 +70,18 @@ public class CallWindow extends JFrame
 		text.setWrapStyleWord(true);
 		main.add(new JScrollPane(text), BorderLayout.CENTER);
 
-
 		JPanel top = new JPanel();
 		top.setLayout(new FlowLayout());
 
 		final JLabel label = new JLabel(contact != null ? contact.getTitle() : number);
 		top.add(label);
 		final JButton select = new JButton("...");
-		select.addActionListener(new ActionListener()
-		{
+		select.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				select.setEnabled(false);
-				DataSelectionEventManager.initiateDataSelection(new DataSelectionListener()
-				{
+				DataSelectionEventManager.initiateDataSelection(new DataSelectionListener() {
 					@Override
 					public void dataSelected(AbstractCrmObject data)
 					{
@@ -102,8 +106,7 @@ public class CallWindow extends JFrame
 		bottom.setLayout(new FlowLayout());
 
 		JButton support = new JButton("Support");
-		support.addActionListener(new ActionListener()
-		{
+		support.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -114,8 +117,7 @@ public class CallWindow extends JFrame
 		bottom.add(support);
 
 		JButton sales = new JButton("Sales");
-		sales.addActionListener(new ActionListener()
-		{
+		sales.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -126,8 +128,7 @@ public class CallWindow extends JFrame
 		bottom.add(sales);
 
 		JButton other = new JButton("Other");
-		other.addActionListener(new ActionListener()
-		{
+		other.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -139,20 +140,28 @@ public class CallWindow extends JFrame
 
 		main.add(bottom, BorderLayout.SOUTH);
 
-		addWindowListener(new WindowAdapter()
-		{
+		addWindowListener(new WindowAdapter() {
 
 			@Override
 			public void windowClosing(WindowEvent we)
 			{
 				String ObjButtons[] = { "Yes", "No" };
-				int PromptResult = JOptionPane.showOptionDialog(CallWindow.this,
-					"Are you sure this call is not worth getting logged?", "CRM Call Logging",
-					JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, CrmIcons.WARN,
-					ObjButtons, ObjButtons[1]);
+				int PromptResult = JOptionPane.showOptionDialog(CallWindow.this, "Are you sure this call is not worth getting logged?", "CRM Call Logging", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, CrmIcons.WARN, ObjButtons, ObjButtons[1]);
 				if (PromptResult == 0)
 				{
 					setVisible(false);
+				}
+				else
+				{
+					EventQueue.invokeLater(new Runnable() {
+
+						@Override
+						public void run()
+						{
+							setVisible(true);
+							CallWindow.this.requestFocus();
+						}
+					});
 				}
 			}
 		});
@@ -160,7 +169,6 @@ public class CallWindow extends JFrame
 		getContentPane().add(main);
 		setSize(300, 250);
 		setVisible(true);
-
 
 		setState(Frame.NORMAL);
 		setAlwaysOnTop(true);
@@ -171,6 +179,7 @@ public class CallWindow extends JFrame
 		text.requestFocusInWindow();
 		text.setCaretPosition(0);
 	}
+
 
 	protected void saveAction(String type)
 	{
@@ -193,6 +202,7 @@ public class CallWindow extends JFrame
 		CrmManager.createCall(c);
 	}
 
+
 	/**
 	 * @param number
 	 */
@@ -202,10 +212,13 @@ public class CallWindow extends JFrame
 		if (contact != null)
 		{
 			final String accountId = ((Contact) contact).getAccountId();
-			Collection<Opportunity> list = CrmManager.getOpportunityListByAccount(accountId);
-			for (Opportunity opportunity : list)
+			if (accountId != null && !accountId.isEmpty())
 			{
-				contact = opportunity;
+				Collection<Opportunity> list = CrmManager.getOpportunityListByAccount(accountId);
+				for (Opportunity opportunity : list)
+				{
+					contact = opportunity;
+				}
 			}
 
 		}
@@ -217,6 +230,5 @@ public class CallWindow extends JFrame
 		else
 			setTitle("Call with " + number);
 	}
-
 
 }

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -219,8 +220,9 @@ public class SwingWindow
 						List<File> fileList = (List<File>)tr.getTransferData(java.awt.datatransfer.DataFlavor.javaFileListFlavor);
 						for (File file : fileList)
 						{
-							Lead lead = FileImporter.importFile(file);
-							DesktopUtil.openBrowser(lead.getViewUrl());
+							Collection<Lead> leads = FileImporter.importFile(file);
+							for (Lead l : leads)
+								DesktopUtil.openBrowser(l.getViewUrl());
 						}
 					}
 					else
