@@ -19,12 +19,15 @@ This project provides a simple desktop application that makes working with your 
 - Task due notification
 - Follow up reminders for cases, opportunities and leads
 - Open email templates with external email client
+- Click2Dial via URL
+- Asterik Call Logging
+- Search (Leads,Contacts)
+- CSV Lead import via Drag&Drop
 
 ## Planned Features
 
 - Opportunity list with email and update function
 - Support for HTML email templates and attachments
-- Push to call
 
 ## Releases 
 
