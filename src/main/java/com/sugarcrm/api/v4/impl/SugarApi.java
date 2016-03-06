@@ -535,6 +535,10 @@ public class SugarApi
 
 	public String postToSugar(final String urlStr) throws Exception
 	{
+        // @drmcg - 2016-03-07 - Changed to call overloaded version of postToSugar that takes content parameter as call to SuiteCRM requires content length when sending POST request
+        return postToSugar(urlStr, "");
+        
+        /*
 		final URL url = new URL(urlStr);
 		final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("POST");
@@ -562,6 +566,7 @@ public class SugarApi
 		conn.disconnect();
 
 		return sb.toString();
+        */
 	}
 
 
