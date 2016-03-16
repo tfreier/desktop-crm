@@ -128,6 +128,7 @@ public class FileImporter
 							desc.append("Decision Maker: ").append(value).append("\n");
 							break;
 						case "Name":
+						case "Contact Name":
 							String[] split = value.split(" ");
 							if (split.length < 2)
 								lead.setLastName(value);
