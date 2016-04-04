@@ -532,7 +532,7 @@ public class CrmManager
 
 		String moduleName = "Leads";
 		String userId = session.getUser().getUserId(); // "a2e0e9a3-4d63-a56b-315b-546a4cdf41a8";//
-		String query = "leads.status<>'Dead' and leads.status<>'dead' and leads.status<>'converted' and leads.status<>'Converted' and" +
+		String query = "leads.status<>'Dead' and leads.status<>'dead' and leads.status<>'converted' and leads.status<>'Converted' and lead.status<>'Deferred' and" +
 			" leads.converted=0" + " and leads.assigned_user_id='" + userId + "'";
 
 
