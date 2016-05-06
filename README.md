@@ -1,6 +1,6 @@
 # Desktop CRM
 
-This project provides a simple desktop application that makes working with your CRM a little easier. 
+This project provides a simple desktop application to make working with your CRM a little easier. 
 
 ## Supported CRMs
 
