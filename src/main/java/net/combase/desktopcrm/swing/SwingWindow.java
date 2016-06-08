@@ -30,7 +30,7 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import org.apache.commons.io.IOUtils;
 
-import net.combase.desktopcrm.data.FileImporter;
+import net.combase.desktopcrm.data.LeadImporter;
 import net.combase.desktopcrm.domain.Lead;
 import net.combase.desktopcrm.swing.DataSelectionEventManager.DataSelectionActivationListener;
 
@@ -221,7 +221,7 @@ public class SwingWindow
 						List<File> fileList = (List<File>)tr.getTransferData(java.awt.datatransfer.DataFlavor.javaFileListFlavor);
 						for (File file : fileList)
 						{
-							Collection<Lead> leads = FileImporter.importFile(file);
+							Collection<Lead> leads = LeadImporter.importFile(file);
 							for (Lead l : leads)
 								DesktopUtil.openBrowser(l.getViewUrl());
 						}

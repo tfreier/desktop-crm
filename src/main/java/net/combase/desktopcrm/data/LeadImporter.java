@@ -22,7 +22,7 @@ import net.combase.desktopcrm.domain.Lead;
 /**
  * @author "Till Freier"
  */
-public class FileImporter
+public class LeadImporter
 {
 	public static Collection<Lead> importFile(File f)
 	{
