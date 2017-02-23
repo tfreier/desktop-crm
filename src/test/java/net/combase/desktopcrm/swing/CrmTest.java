@@ -26,7 +26,7 @@ public class CrmTest
 
 		try
 		{
-			HttpGet get = new HttpGet("http://10.1.0.11/cgi-bin/ConfigManApp.com?number=702-927-6689");
+			HttpGet get = new HttpGet("http://10.1.0.11/cgi-bin/ConfigManApp.com?number=123-456-7890");
 			CredentialsProvider provider = new BasicCredentialsProvider();
 			UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "admin");
 			provider.setCredentials(AuthScope.ANY, credentials);
