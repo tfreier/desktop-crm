@@ -867,7 +867,7 @@ public class CrmManager
 			String newDueStr = due.toDateTime(DateTimeZone.getDefault()).toString("yyyy-MM-dd hh:mm");
 			String oldDueStr = formatter.parseDateTime(bean.get("date_due")).plusHours(gmtOffset).toDateTime(DateTimeZone.getDefault()).toString("yyyy-MM-dd hh:mm");
 			sb.append("Rescheduled from ").append(oldDueStr).append(" to ").append(newDueStr);
-			bean.set("date_due", formatter.print(due.minusHours(gmtOffset)));
+			bean.set("date_due", formatter.print(due.toDateTime(DateTimeZone.UTC).minusHours(gmtOffset)));
 			bean.set("description", sb.toString());
 
 			api.setBean(session, bean);

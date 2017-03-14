@@ -246,9 +246,10 @@ public class TaskTableModel extends AbstractTableModel
 						due = due.plusWeeks(1);
 						break;
 					case TOMORROW_AM:
-						due = due.plusDays(1).toLocalDate().toDateTime(new LocalTime(9, 0, 0));
+						due = new DateTime().plusDays(1).toLocalDate().toDateTime(new LocalTime(9, 0, 0));
+						break;
 					case TOMORROW_PM:
-						due = due.plusDays(1).toLocalDate().toDateTime(new LocalTime(14, 0, 0));
+						due = new DateTime().plusDays(1).toLocalDate().toDateTime(new LocalTime(14, 0, 0));
 						break;
 					case DAYS_2:
 						due = due.plusDays(2);
