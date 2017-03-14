@@ -19,7 +19,44 @@ public class Task extends AbstractCrmObject
 	private String parentId;
 
 	private String description;
+	
+	private String extendedTitle;
+	
+	private String phoneInfo;
+	
+	
+	
+	/**
+	 * @return the phoneInfo
+	 */
+	public String getPhoneInfo()
+	{
+		return phoneInfo;
+	}
 
+	/**
+	 * @param phoneInfo the phoneInfo to set
+	 */
+	public void setPhoneInfo(String phoneInfo)
+	{
+		this.phoneInfo = phoneInfo;
+	}
+
+	/**
+	 * @return the extendedTitle
+	 */
+	public String getExtendedTitle()
+	{
+		return extendedTitle;
+	}
+
+	/**
+	 * @param extendedTitle the extendedTitle to set
+	 */
+	public void setExtendedTitle(String extendedTitle)
+	{
+		this.extendedTitle = extendedTitle;
+	}
 
 	public String getDescription()
 	{

@@ -34,6 +34,8 @@ import net.combase.desktopcrm.swing.DataSelectionEventManager.DataSelectionListe
 
 
 /**
+ * TODO: create task from call use URL crm/index.php?module=Tasks&action=EditView&record=4fc558fb-1303-f533-cdda-57913ac416e9
+ * 
  * @author "Till Freier"
  */
 public class CallWindow extends JFrame
@@ -211,6 +213,7 @@ public class CallWindow extends JFrame
 		contact = CrmManager.getContactByNumber(number);
 		if (contact != null)
 		{
+			setIconImage(CrmIcons.USER.getImage());
 			final String accountId = ((Contact) contact).getAccountId();
 			if (accountId != null && !accountId.isEmpty())
 			{
@@ -218,12 +221,16 @@ public class CallWindow extends JFrame
 				for (Opportunity opportunity : list)
 				{
 					contact = opportunity;
+					setIconImage(CrmIcons.BELL.getImage());
 				}
 			}
 
 		}
 		else
+		{
 			contact = CrmManager.getLeadByNumber(number);
+			setIconImage(CrmIcons.USER.getImage());
+		}
 
 		if (contact != null)
 			setTitle("Call with " + contact.getTitle());

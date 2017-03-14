@@ -140,7 +140,7 @@ public class SwingWindow
 
 		tabbedPane.addTab("Tasks", CrmIcons.DONE, new TaskTablePanel());
 		tabbedPane.addTab("Calls", CrmIcons.CALL, new CallTablePanel());
-		tabbedPane.addTab("Action Required", CrmIcons.RECHEDULE, new ActionRequiredTablePanel());
+		tabbedPane.addTab("Action Required", CrmIcons.BELL, new ActionRequiredTablePanel());
 		tabbedPane.addTab("Cases", CrmIcons.WARN, new CaseTablePanel());
 		tabbedPane.addTab("Leads", CrmIcons.USER, new LeadTablePanel());
 		tabbedPane.addTab("Search", CrmIcons.VIEW, new SearchTablePanel());

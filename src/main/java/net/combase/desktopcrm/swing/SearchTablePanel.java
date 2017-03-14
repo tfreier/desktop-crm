@@ -178,7 +178,7 @@ public class SearchTablePanel extends JPanel
 			public void valueChanged(ListSelectionEvent e)
 			{
 				int index = e.getFirstIndex();
-				if (index < 0)
+				if (index < 0 || model.getData() == null || model.getData().size() < 1)
 					return;
 
 				AbstractCrmObject data = model.getData().get(index);

@@ -85,6 +85,9 @@ public final class CrmHelper
 		boolean noAction = CrmManager.getTaskListByParent(lead.getId()).isEmpty();
 
 		if (noAction)
+			noAction = CrmManager.getMeetingListByParent(lead.getId()).isEmpty();
+		
+		if (noAction)
 			noAction = CrmManager.getCallListByParent(lead.getId()).isEmpty();
 
 		return !noAction;
