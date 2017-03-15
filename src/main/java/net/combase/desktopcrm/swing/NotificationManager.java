@@ -5,8 +5,6 @@ package net.combase.desktopcrm.swing;
 
 import java.awt.EventQueue;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import ch.swingfx.twinkle.NotificationBuilder;
 import ch.swingfx.twinkle.event.NotificationEvent;
@@ -21,191 +19,198 @@ import net.combase.desktopcrm.domain.Call;
 import net.combase.desktopcrm.domain.CallType;
 import net.combase.desktopcrm.domain.Meeting;
 
+
+
 /**
  * @author "Till Freier"
- *
  */
 public class NotificationManager
 {
-    private static Timer timer = null;
+	private static boolean init = false;
 
-    private static String lastCallNumber = "";
+	private static String lastCallNumber = "";
 
-    public static synchronized void init()
-    {
-	if (timer != null)
-	    throw new RuntimeException("notification manager is already initialized");
 
-	timer = new Timer(true);
+	public static synchronized void init()
+	{
+		if (init)
+			throw new RuntimeException("notification manager is already initialized");
+		
+		init = true;
 
-	initActionTimer();
-	initCallTimer();
-	initMeetingTimer();
+		initActionTimer();
+		initCallTimer();
+		initMeetingTimer();
 
-	AsteriskManager.setup();
-	AsteriskManager.addListener(new AsteriskCallEventListener() {
+		AsteriskManager.setup();
+		AsteriskManager.addListener(new AsteriskCallEventListener() {
 
-	    @Override
-	    public void incomingCall(final String number)
-	    {
-		EventQueue.invokeLater(new Runnable() {
-		    @Override
-		    public void run()
-		    {
-			if (number.equals(lastCallNumber))
-			{
-			    System.out.println("skip call event");
-			    return;
-			}
-
-			new CallWindow(number, CallType.INBOUND);
-
-			lastCallNumber = number;
-		    }
-		});
-	    }
-
-	    @Override
-	    public void outgoingCall(final String number)
-	    {
-		EventQueue.invokeLater(new Runnable() {
-		    @Override
-		    public void run()
-		    {
-			if (number.equals(lastCallNumber))
-			{
-			    System.out.println("skip call event");
-			    return;
-			}
-
-			new CallWindow(number, CallType.OUTBOUND);
-
-			lastCallNumber = number;
-		    }
-		});
-	    }
-	});
-    }
-
-    /**
-     * 
-     */
-    private static void initActionTimer()
-    {
-	timer.schedule(new TimerTask() {
-	    @Override
-	    public void run()
-	    {
-		List<AbstractCrmObject> leadList = CrmHelper.getActionObjects();
-		for (final AbstractCrmObject lead : leadList)
-		{
-		    System.out.println("request action item for " + lead.getTitle());
-		    String msg = "'" + lead.getTitle() + "' has no planned actions. Click here to schedule a task.";
-
-		    NotificationBuilder nb = DesktopUtil.createNotificationBuilder();
-		    nb.withTitle("Plan Follow Up Action");
-		    nb.withMessage(msg);
-		    nb.withIcon(CrmIcons.TALK);
-		    nb.withDisplayTime(60000);
-
-		    nb.withListener(new NotificationEventAdapter() {
 			@Override
-			public void clicked(NotificationEvent event)
+			public void incomingCall(final String number)
 			{
-			    DesktopUtil.openBrowser(lead.getViewUrl());
+				EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run()
+					{
+						if (number.equals(lastCallNumber))
+						{
+							System.out.println("skip call event");
+							return;
+						}
+
+						new CallWindow(number, CallType.INBOUND);
+
+						lastCallNumber = number;
+					}
+				});
 			}
-		    });
 
-		    nb.showNotification();
 
-		    // wait 2 minutes
-		    try
-		    {
-			Thread.sleep(180000);
-		    } catch (InterruptedException e1)
-		    {
-			e1.printStackTrace();
-		    }
-		}
-	    }
-	}, 3000, 300000);
-    }
+			@Override
+			public void outgoingCall(final String number)
+			{
+				EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run()
+					{
+						if (number.equals(lastCallNumber))
+						{
+							System.out.println("skip call event");
+							return;
+						}
 
-    /**
-     * 
-     */
-    private static void initCallTimer()
-    {
-	timer.schedule(new TimerTask() {
-	    @Override
-	    public void run()
-	    {
-		System.out.println("Check for calls...");
+						new CallWindow(number, CallType.OUTBOUND);
 
-		if (DataStoreManager.getSettings().isCallReminder())
-		{
-		    final Call c = CrmManager.getUpcomingCall();
-		    if (c != null)
-		    {
-			String msg = "You have an upcoming call: " + c.getTitle();
+						lastCallNumber = number;
+					}
+				});
+			}
+		});
+	}
 
-			NotificationBuilder nb = DesktopUtil.createNotificationBuilder();
-			nb.withTitle("Upcoming Call");
-			nb.withMessage(msg);
-			nb.withIcon(CrmIcons.CALL);
-			nb.withDisplayTime(30000);
 
-			nb.withListener(new NotificationEventAdapter() {
-			    @Override
-			    public void clicked(NotificationEvent event)
-			    {
-				DesktopUtil.openBrowser(c.getViewUrl());
-			    }
-			});
+	/**
+	 * 
+	 */
+	private static void initActionTimer()
+	{
+		UiUtil.runAndRepeat(new Runnable() {
+			@Override
+			public void run()
+			{
+				List<AbstractCrmObject> leadList = CrmHelper.getActionObjects();
+				for (final AbstractCrmObject lead : leadList)
+				{
+					System.out.println("request action item for " + lead.getTitle());
+					String msg = "'" + lead.getTitle() + "' has no planned actions. Click here to schedule a task.";
 
-			nb.showNotification();
-		    }
-		}
-	    }
-	}, 5000, 120000);
-    }
+					NotificationBuilder nb = DesktopUtil.createNotificationBuilder();
+					nb.withTitle("Plan Follow Up Action");
+					nb.withMessage(msg);
+					nb.withIcon(CrmIcons.TALK);
+					nb.withDisplayTime(60000);
 
-    /**
-     * 
-     */
-    private static void initMeetingTimer()
-    {
-	timer.schedule(new TimerTask() {
-	    @Override
-	    public void run()
-	    {
-		System.out.println("Check for meetings...");
+					nb.withListener(new NotificationEventAdapter() {
+						@Override
+						public void clicked(NotificationEvent event)
+						{
+							DesktopUtil.openBrowser(lead.getViewUrl());
+						}
+					});
 
-		if (DataStoreManager.getSettings().isMeetingReminder())
-		{
-		    final Meeting c = CrmManager.getUpcomingMeeting();
-		    if (c != null)
-		    {
-			String msg = "You have an upcoming meeting: " + c.getTitle();
+					nb.showNotification();
 
-			NotificationBuilder nb = DesktopUtil.createNotificationBuilder();
-			nb.withTitle("Upcoming Meeting");
-			nb.withMessage(msg);
-			nb.withIcon(CrmIcons.COFFEE);
-			nb.withDisplayTime(30000);
+					// wait 2 minutes
+					try
+					{
+						Thread.sleep(180000);
+					}
+					catch (InterruptedException e1)
+					{
+						e1.printStackTrace();
+					}
+				}
+			}
+		}, 3000, 300000);
+	}
 
-			nb.withListener(new NotificationEventAdapter() {
-			    @Override
-			    public void clicked(NotificationEvent event)
-			    {
-				DesktopUtil.openBrowser(c.getViewUrl());
-			    }
-			});
 
-			nb.showNotification();
-		    }
-		}
-	    }
-	}, 5000, 120000);
-    }
+	/**
+	 * 
+	 */
+	private static void initCallTimer()
+	{
+		UiUtil.runAndRepeat(new Runnable() {
+			@Override
+			public void run()
+			{
+				System.out.println("Check for calls...");
+
+				if (DataStoreManager.getSettings().isCallReminder())
+				{
+					final Call c = CrmManager.getUpcomingCall();
+					if (c != null)
+					{
+						String msg = "You have an upcoming call: " + c.getTitle();
+
+						NotificationBuilder nb = DesktopUtil.createNotificationBuilder();
+						nb.withTitle("Upcoming Call");
+						nb.withMessage(msg);
+						nb.withIcon(CrmIcons.CALL);
+						nb.withDisplayTime(30000);
+
+						nb.withListener(new NotificationEventAdapter() {
+							@Override
+							public void clicked(NotificationEvent event)
+							{
+								DesktopUtil.openBrowser(c.getViewUrl());
+							}
+						});
+
+						nb.showNotification();
+					}
+				}
+			}
+		}, 5000, 120000);
+	}
+
+
+	/**
+	 * 
+	 */
+	private static void initMeetingTimer()
+	{
+		UiUtil.runAndRepeat(new Runnable() {
+			@Override
+			public void run()
+			{
+				System.out.println("Check for meetings...");
+
+				if (DataStoreManager.getSettings().isMeetingReminder())
+				{
+					final Meeting c = CrmManager.getUpcomingMeeting();
+					if (c != null)
+					{
+						String msg = "You have an upcoming meeting: " + c.getTitle();
+
+						NotificationBuilder nb = DesktopUtil.createNotificationBuilder();
+						nb.withTitle("Upcoming Meeting");
+						nb.withMessage(msg);
+						nb.withIcon(CrmIcons.COFFEE);
+						nb.withDisplayTime(30000);
+
+						nb.withListener(new NotificationEventAdapter() {
+							@Override
+							public void clicked(NotificationEvent event)
+							{
+								DesktopUtil.openBrowser(c.getViewUrl());
+							}
+						});
+
+						nb.showNotification();
+					}
+				}
+			}
+		}, 7000, 120000);
+	}
 }

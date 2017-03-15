@@ -149,6 +149,7 @@ public class CrmManager
 			String startDate = bean.get("date_start");
 			if (startDate != null && !startDate.trim().isEmpty())
 				obj.setStart(new DateTime(formatter.parseDateTime(startDate)));
+			obj.setPlanned("Planned".equals(bean.get("status")));
 		}
 	};
 
@@ -986,9 +987,17 @@ public class CrmManager
 			{
 				int ret = 0;
 
+				if (o1.isPlanned() && !o2.isPlanned())
+					return -1;
+				if (!o1.isPlanned() && o2.isPlanned())
+					return 1;
+				
 				if (o1.getStart() != null && o2.getStart() != null)
 					ret = o1.getStart().compareTo(o2.getStart());
 
+				if (!o1.isPlanned())
+					ret = ret*-1;
+				
 				if (ret != 0)
 					return ret;
 
@@ -1004,7 +1013,7 @@ public class CrmManager
 
 		String moduleName = "Calls";
 		String userId = session.getUser().getUserId(); // "a2e0e9a3-4d63-a56b-315b-546a4cdf41a8";//
-		String query = "calls.status='Planned' and calls.date_start>'2000-01-01' and calls.assigned_user_id='" + userId + "'";
+		String query = "((calls.status='Planned' and calls.date_start>'2000-01-01') or calls.date_start>CURDATE()) and calls.assigned_user_id='" + userId + "'";
 
 		Collection<Call> collection = loadCrmObjects(CALL_CREATOR, moduleName, query);
 		set.addAll(collection);

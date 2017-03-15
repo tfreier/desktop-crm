@@ -10,13 +10,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimerTask;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableCellRenderer;
 
 import net.combase.desktopcrm.data.CrmManager;
@@ -133,28 +133,37 @@ public class TaskTablePanel extends JPanel
 			}
 		});
 
-		java.util.Timer t = new java.util.Timer(true);
-		t.schedule(new TimerTask() {
+		UiUtil.runAndRepeat(new Runnable() {
+
 			@Override
 			public void run()
 			{
-				List<Task> updatedList = CrmManager.getTaskList();
+				final List<Task> updatedList = CrmManager.getTaskList();
 				System.out.println(updatedList);
 				int r = table.getSelectedRow();
 				Task t = null;
 				if (r >= 0)
 					t = model.getTask(r);
-				model.update(updatedList);
-				if (t != null)
-				{
-					int i = 0;
-					for (Task task : updatedList)
-					{
-						if (task.getId().equals(t.getId()))
-							table.setRowSelectionInterval(i, i);
-						i++;
-					}
-				}
+				final String oldTaskId = (t != null) ? t.getId() : null;
+				if (updatedList != null)
+					SwingUtilities.invokeLater(new Runnable() {
+
+						@Override
+						public void run()
+						{
+							model.update(updatedList);
+							if (oldTaskId != null)
+							{
+								int i = 0;
+								for (Task task : updatedList)
+								{
+									if (task.getId().equals(oldTaskId))
+										table.setRowSelectionInterval(i, i);
+									i++;
+								}
+							}
+						}
+					});
 			}
 		}, 500, 120000);
 	}

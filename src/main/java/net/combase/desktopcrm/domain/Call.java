@@ -14,6 +14,26 @@ public class Call extends AbstractCrmObject
 	private DateTime start;
 	private CallType type;
 	private String description;
+	private boolean planned;
+
+	
+
+	/**
+	 * @return the planned
+	 */
+	public boolean isPlanned()
+	{
+		return planned;
+	}
+
+
+	/**
+	 * @param planned the planned to set
+	 */
+	public void setPlanned(boolean planned)
+	{
+		this.planned = planned;
+	}
 
 
 	public String getDescription()
