@@ -362,7 +362,7 @@ public class CrmManager
 		String userId = session.getUser().getUserId(); // "a2e0e9a3-4d63-a56b-315b-546a4cdf41a8";//
 		String query = "tasks.status<>'Completed' and tasks.status<>'Deferred' and tasks.assigned_user_id='" + userId + "'";
 
-		Collection<Task> collection = loadCrmObjects(TASK_CREATOR, moduleName, query);
+		Collection<Task> collection = loadCrmObjects(TASK_CREATOR, moduleName, query, "tasks.date_due");
 		set.addAll(collection);
 
 		return new ArrayList<>(set);
