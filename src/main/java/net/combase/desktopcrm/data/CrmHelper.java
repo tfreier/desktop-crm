@@ -82,7 +82,7 @@ public final class CrmHelper
 	 */
 	public static boolean hasActionsPlanned(final AbstractCrmObject lead)
 	{
-		boolean noAction = CrmManager.getTaskListByParent(lead.getId()).isEmpty();
+		boolean noAction = CrmManager.getOpenTaskListByParent(lead.getId()).isEmpty();
 
 		if (noAction)
 			noAction = CrmManager.getMeetingListByParent(lead.getId()).isEmpty();

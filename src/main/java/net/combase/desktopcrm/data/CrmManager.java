@@ -114,6 +114,7 @@ public class CrmManager
 					break;
 			}
 			obj.setExtendedTitle(result);
+			obj.setStatus(bean.get("status"));
 		}
 
 	};
@@ -369,12 +370,22 @@ public class CrmManager
 	}
 
 
+	public static List<Task> getOpenTaskListByParent(String parentId)
+	{
+		String moduleName = "Tasks";
+		String query = "tasks.status<>'Completed' and (tasks.parent_id='" + parentId + "' or tasks.contact_id='" + parentId + "')";
+
+		Collection<Task> collection = loadCrmObjects(TASK_CREATOR, moduleName, query, "tasks.date_due");
+
+		return new ArrayList<>(collection);
+	}
+	
 	public static List<Task> getTaskListByParent(String parentId)
 	{
 		String moduleName = "Tasks";
-		String query = "tasks.status<>'Completed' and tasks.parent_id='" + parentId + "'";
+		String query = "(tasks.parent_id='" + parentId + "' or tasks.contact_id='" + parentId + "')";
 
-		Collection<Task> collection = loadCrmObjects(TASK_CREATOR, moduleName, query, "tasks.date_due");
+		Collection<Task> collection = loadCrmObjects(TASK_CREATOR, moduleName, query, "tasks.date_due DESC");
 
 		return new ArrayList<>(collection);
 	}
@@ -839,6 +850,7 @@ public class CrmManager
 		String id = entity.getId();
 		final T t = creator.createObject(id, entity.get("name"));
 		t.setViewUrl(createObjectUrl(moduleName, id));
+		t.setEditUrl(createObjectEditUrl(moduleName, id));
 		t.setAssignedUser(entity.get("assigned_user_name"));
 		creator.prepare(t, entity);
 		return t;
@@ -853,6 +865,10 @@ public class CrmManager
 	public static String createObjectUrl(String moduleName, String id)
 	{
 		return sugarUrl + "/index.php?action=DetailView&module=" + moduleName + "&record=" + id;
+	}
+	public static String createObjectEditUrl(String moduleName, String id)
+	{
+		return sugarUrl + "/index.php?action=EditView&module=" + moduleName + "&record=" + id;
 	}
 
 

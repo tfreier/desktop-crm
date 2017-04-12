@@ -11,6 +11,7 @@ public abstract class AbstractCrmObject
 {
 	private String id;
 	private String viewUrl;
+	private String editUrl;
 	private String relatedObjectType;
 	private String relatedObjectUrl;
 	private String relatedObjectId;
@@ -68,6 +69,17 @@ public abstract class AbstractCrmObject
 	{
 		this.viewUrl = viewUrl;
 	}
+	
+	public String getEditUrl()
+	{
+		return editUrl;
+	}
+
+	public void setEditUrl(String editUrl)
+	{
+		this.editUrl = editUrl;
+	}
+
 
 	public String getRelatedObjectType()
 	{

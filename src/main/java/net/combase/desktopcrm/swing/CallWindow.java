@@ -11,7 +11,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,16 +21,23 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import org.joda.time.DateTime;
 
+import com.google.common.collect.Lists;
+
+import ch.swingfx.twinkle.NotificationBuilder;
+import ch.swingfx.twinkle.window.Positions;
 import net.combase.desktopcrm.data.CrmManager;
 import net.combase.desktopcrm.domain.AbstractCrmObject;
 import net.combase.desktopcrm.domain.Call;
 import net.combase.desktopcrm.domain.CallType;
 import net.combase.desktopcrm.domain.Contact;
 import net.combase.desktopcrm.domain.Opportunity;
+import net.combase.desktopcrm.domain.Task;
 import net.combase.desktopcrm.swing.DataSelectionEventManager.DataSelectionListener;
 
 
@@ -53,6 +62,8 @@ public class CallWindow extends JFrame
 	private JTextArea text;
 
 	private final CallType type;
+	
+	private TaskTablePanel taskPanel;
 
 
 	public CallWindow(String number, CallType type)
@@ -77,7 +88,9 @@ public class CallWindow extends JFrame
 
 		final JLabel label = new JLabel(contact != null ? contact.getTitle() : number);
 		top.add(label);
-		final JButton select = new JButton("...");
+		final JButton select = new JButton("");
+		select.setIcon(CrmIcons.SETTINGS);
+		select.setToolTipText("Change Contact");
 		select.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -101,6 +114,30 @@ public class CallWindow extends JFrame
 			}
 		});
 		top.add(select);
+		final JButton view = new JButton("");
+		view.setIcon(CrmIcons.VIEW);
+		view.setToolTipText("Open Contact");
+		view.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				if (contact == null)
+				{
+					NotificationBuilder nb = DesktopUtil.createNotificationBuilder();
+					nb.withTitle("No contact found");
+					nb.withMessage("Please assign a contact first.");
+					nb.withIcon(CrmIcons.WARN);
+					nb.withDisplayTime(3000);
+					nb.withPosition(Positions.CENTER);
+
+					nb.showNotification();
+				}
+				else
+					DesktopUtil.openBrowser(contact.getViewUrl());
+				
+			}
+		});
+		top.add(view);
 
 		main.add(top, BorderLayout.NORTH);
 
@@ -167,9 +204,21 @@ public class CallWindow extends JFrame
 				}
 			}
 		});
+		
+		taskPanel = new TaskTablePanel(new ArrayList<Task>(0));
+		
+		final JPanel mainTask = new JPanel();
+		mainTask.setLayout(new BorderLayout());
+		mainTask.add(taskPanel, BorderLayout.CENTER);
+		
+		
+		final JTabbedPane tabbedPane = new JTabbedPane();
 
-		getContentPane().add(main);
-		setSize(300, 250);
+		tabbedPane.addTab("Call Info", CrmIcons.CALL, main);
+		tabbedPane.addTab("Related Tasks", CrmIcons.DONE, mainTask);
+
+		getContentPane().add(tabbedPane);
+		setSize(500, 400);
 		setVisible(true);
 
 		setState(Frame.NORMAL);
@@ -236,6 +285,20 @@ public class CallWindow extends JFrame
 			setTitle("Call with " + contact.getTitle());
 		else
 			setTitle("Call with " + number);
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run()
+			{
+				if (contact == null)
+					return;
+				final List<Task> tasks = CrmManager.getTaskListByParent(contact.getId());
+				taskPanel.updateTaskList(Lists.reverse(tasks));
+				
+				text.requestFocus();
+			}
+		});
 	}
 
 }

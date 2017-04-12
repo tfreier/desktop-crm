@@ -64,8 +64,7 @@ public class TaskTableModel extends AbstractTableModel
 		@Override
 		public String toString()
 		{
-			// TODO Auto-generated method stub
-			return super.toString();
+			return label;
 		}
 		
 		
@@ -77,9 +76,9 @@ public class TaskTableModel extends AbstractTableModel
 	 */
 	private static final long serialVersionUID = -3890791456083674319L;
 
-	private static final String[] COLUMN_NAMES = new String[] { "Task", "Due", "", "", "", "", "", "" };
+	private static final String[] COLUMN_NAMES = new String[] { "Task", "Due", "", "", "", "", "", "", "" };
 
-	private static final Class<?>[] COLUMN_TYPES = new Class<?>[] { String.class, String.class, JButton.class, JButton.class, JButton.class, JButton.class, JButton.class, JButton.class };
+	private static final Class<?>[] COLUMN_TYPES = new Class<?>[] { String.class, String.class, JButton.class, JButton.class, JButton.class, JButton.class, JButton.class, JButton.class, JButton.class };
 
 	private final List<Task> data;
 
@@ -172,14 +171,16 @@ public class TaskTableModel extends AbstractTableModel
 			case 2:
 				return createViewRelationButton(task);
 			case 3:
-				return createViewButton(task);
-			case 4:
 				return createMessageButton(task);
-			case 5:
+			case 4:
 				return createCallButton(task);
+			case 5:
+				return createViewButton(task);
 			case 6:
-				return createRescheduleButton(task);
+				return createEditButton(task);
 			case 7:
+				return createRescheduleButton(task);
+			case 8:
 				return createDoneButton(task);
 
 			default:
@@ -205,13 +206,22 @@ public class TaskTableModel extends AbstractTableModel
 		});
 
 		button.setIcon(CrmIcons.DONE);
-		if (task.getDue() != null && task.getDue().isBeforeNow())
+		
+		boolean completed = "completed".equals(task.getStatus().toLowerCase());
+		if (task.getDue() != null && task.getDue().isBeforeNow() && !completed)
 			button.setBackground(new Color(255, 0, 0, ALPHA));
-		else if (task.getDue() != null && task.getDue().toLocalDate().isEqual(new LocalDate()))
+		else if (task.getDue() != null && task.getDue().toLocalDate().isEqual(new LocalDate()) && !completed)
 			button.setBackground(new Color(255, 150, 0, ALPHA));
 		else
 			button.setBackground(new Color(100, 255, 100, ALPHA));
-		button.setToolTipText("Mark as done...");
+		if (completed)
+		{
+			button.setToolTipText("Task is already completed");
+			button.setEnabled(false);
+			
+		}
+		else
+			button.setToolTipText("Mark as done...");
 
 		return button;
 	}
@@ -287,6 +297,24 @@ public class TaskTableModel extends AbstractTableModel
 		button.setBackground(new Color(90, 115, 255, ALPHA));
 		button.setIcon(CrmIcons.VIEW);
 		button.setToolTipText("View task...");
+
+		return button;
+	}
+
+	private JButton createEditButton(final Task task)
+	{
+		final JButton button = new JButton();
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				DesktopUtil.openBrowser(task.getEditUrl());
+			}
+		});
+
+		button.setBackground(new Color(10, 255, 255, ALPHA));
+		button.setIcon(CrmIcons.SETTINGS);
+		button.setToolTipText("Edit task...");
 
 		return button;
 	}

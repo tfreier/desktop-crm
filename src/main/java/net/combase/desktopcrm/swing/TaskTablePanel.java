@@ -33,16 +33,40 @@ public class TaskTablePanel extends JPanel
 	private static final long serialVersionUID = -6149463410211475900L;
 
 	private JTable table;
-
+	private TaskTableModel model;
 
 	/**
 	 * Create the panel.
 	 */
 	public TaskTablePanel()
 	{
+		init();
+
+		UiUtil.runAndRepeat(new Runnable() {
+
+			@Override
+			public void run()
+			{
+				final List<Task> updatedList = CrmManager.getTaskList();
+				System.out.println(updatedList);
+				updateTaskList(updatedList);
+			}
+		}, 500, 120000);
+	}
+	
+
+	public TaskTablePanel(List<Task> taskList)
+	{
+		init();
+		updateTaskList(taskList);
+	}
+
+
+	private void init()
+	{
 		setLayout(new BorderLayout(0, 0));
 
-		final TaskTableModel model = new TaskTableModel(new ArrayList<Task>());
+		model = new TaskTableModel(new ArrayList<Task>());
 
 		table = new JTable(model);
 
@@ -86,6 +110,7 @@ public class TaskTablePanel extends JPanel
 		table.getColumnModel().getColumn(5).setMaxWidth(30);
 		table.getColumnModel().getColumn(6).setMaxWidth(30);
 		table.getColumnModel().getColumn(7).setMaxWidth(30);
+		table.getColumnModel().getColumn(8).setMaxWidth(30);
 		table.setRowHeight(30);
 
 		add(table.getTableHeader(), BorderLayout.NORTH);
@@ -117,7 +142,6 @@ public class TaskTablePanel extends JPanel
 							title = CrmManager.getContact(parentId).getTitle();
 							break;
 						case "Accounts":
-							title = CrmManager.getCase(parentId).getTitle();
 							break;
 						case "Opportunities":
 							title = CrmManager.getOpprtunity(parentId).getTitle();
@@ -132,40 +156,35 @@ public class TaskTablePanel extends JPanel
 				}
 			}
 		});
+	}
 
-		UiUtil.runAndRepeat(new Runnable() {
 
-			@Override
-			public void run()
-			{
-				final List<Task> updatedList = CrmManager.getTaskList();
-				System.out.println(updatedList);
-				int r = table.getSelectedRow();
-				Task t = null;
-				if (r >= 0)
-					t = model.getTask(r);
-				final String oldTaskId = (t != null) ? t.getId() : null;
-				if (updatedList != null)
-					SwingUtilities.invokeLater(new Runnable() {
+	public void updateTaskList(final List<Task> updatedList)
+	{
+		int r = table.getSelectedRow();
+		Task t = null;
+		if (r >= 0)
+			t = model.getTask(r);
+		final String oldTaskId = (t != null) ? t.getId() : null;
+		if (updatedList != null)
+			SwingUtilities.invokeLater(new Runnable() {
 
-						@Override
-						public void run()
+				@Override
+				public void run()
+				{
+					model.update(updatedList);
+					if (oldTaskId != null)
+					{
+						int i = 0;
+						for (Task task : updatedList)
 						{
-							model.update(updatedList);
-							if (oldTaskId != null)
-							{
-								int i = 0;
-								for (Task task : updatedList)
-								{
-									if (task.getId().equals(oldTaskId))
-										table.setRowSelectionInterval(i, i);
-									i++;
-								}
-							}
+							if (task.getId().equals(oldTaskId))
+								table.setRowSelectionInterval(i, i);
+							i++;
 						}
-					});
-			}
-		}, 500, 120000);
+					}
+				}
+			});
 	}
 
 }
