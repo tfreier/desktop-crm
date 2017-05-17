@@ -5,18 +5,82 @@ package net.combase.desktopcrm.domain;
 
 import org.joda.time.DateTime;
 
+
+
 /**
  * @author till
- *
  */
 public class Call extends AbstractCrmObject
 {
 	private DateTime start;
+
 	private CallType type;
+
 	private String description;
+
 	private boolean planned;
 
+	private String parentType;
+
+	private String parentId;
 	
+	private String extendedTitle;
+
+	
+
+	/**
+	 * @return the extendedTitle
+	 */
+	public String getExtendedTitle()
+	{
+		return extendedTitle;
+	}
+
+
+	/**
+	 * @param extendedTitle the extendedTitle to set
+	 */
+	public void setExtendedTitle(String extendedTitle)
+	{
+		this.extendedTitle = extendedTitle;
+	}
+
+
+	/**
+	 * @return the parentType
+	 */
+	public String getParentType()
+	{
+		return parentType;
+	}
+
+
+	/**
+	 * @param parentType the parentType to set
+	 */
+	public void setParentType(String parentType)
+	{
+		this.parentType = parentType;
+	}
+
+
+	/**
+	 * @return the parentId
+	 */
+	public String getParentId()
+	{
+		return parentId;
+	}
+
+
+	/**
+	 * @param parentId the parentId to set
+	 */
+	public void setParentId(String parentId)
+	{
+		this.parentId = parentId;
+	}
+
 
 	/**
 	 * @return the planned
@@ -60,14 +124,14 @@ public class Call extends AbstractCrmObject
 	}
 
 
-
-	public DateTime getStart() {
+	public DateTime getStart()
+	{
 		return start;
 	}
 
 
-
-	public void setStart(DateTime start) {
+	public void setStart(DateTime start)
+	{
 		this.start = start;
 	}
 

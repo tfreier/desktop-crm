@@ -56,6 +56,51 @@ public class CrmManager
 	}
 
 
+	private static String createExtendedTitle(String type, String id)
+	{
+		String result = "";
+		if (type != null && id != null)
+			switch (type)
+			{
+				case "Cases":
+					Case c = CrmManager.getCase(id);
+					if (c != null)
+						result = c.getTitle();
+					break;
+				case "Leads":
+					Lead lead = CrmManager.getLead(id);
+					if (lead != null)
+						result = lead.getTitle();
+					if (lead.getAccountName() != null)
+						result += " | " + lead.getAccountName();
+					break;
+				case "Contacts":
+					Contact contact = CrmManager.getContact(id);
+					if (contact != null)
+						result = contact.getFirstname() + " " + contact.getLastName();
+					break;
+				case "Accounts":
+				case "Prospects":
+					break;
+				case "Opportunities":
+					Opportunity o = CrmManager.getOpprtunity(id);
+					if (o != null)
+						result = o.getTitle();
+					Collection<Contact> contacts = CrmManager.getContactListByOpportunity(id);
+					if (contacts != null && !contacts.isEmpty())
+					{
+						Contact next = contacts.iterator().next();
+						result += "; " + next.getTitle();
+					}
+					break;
+				default:
+					break;
+			}
+
+		return result;
+	}
+
+
 	private static final CrmObjectCreator<Task> TASK_CREATOR = new CrmObjectCreator<Task>() {
 
 		@Override
@@ -74,46 +119,8 @@ public class CrmManager
 
 			obj.setParentType(bean.get("parent_type"));
 			obj.setParentId(bean.get("parent_id"));
-			
-			String result = obj.getParentType();
-			String id = obj.getParentId();
-			switch (obj.getParentType())
-			{
-				case "Cases":
-					Case c = CrmManager.getCase(id);
-					if (c != null)
-						result = c.getTitle();
-					break;
-				case "Leads":
-					Lead lead = CrmManager.getLead(id);
-					if (lead != null)
-						result = lead.getTitle();
-					if (lead.getAccountName() != null)
-						result += " | " + lead.getAccountName();
-					break;
-				case "Contacts":
-					Contact contact = CrmManager.getContact(id);
-					if (contact != null)
-						result = contact.getFirstname() + " "  + contact.getLastName();
-					break;
-				case "Accounts":
-				case "Prospects":
-					break;
-				case "Opportunities":
-					Opportunity o = CrmManager.getOpprtunity(id);
-					if (o != null)
-						result = o.getTitle();
-					Collection<Contact> contacts = CrmManager.getContactListByOpportunity(id);
-					if (contacts != null && !contacts.isEmpty())
-					{
-						Contact next = contacts.iterator().next();
-						result += "; "+next.getTitle();
-					}
-					break;
-				default:
-					break;
-			}
-			obj.setExtendedTitle(result);
+
+			obj.setExtendedTitle(createExtendedTitle(obj.getParentType(), obj.getParentId()));
 			obj.setStatus(bean.get("status"));
 		}
 
@@ -151,6 +158,11 @@ public class CrmManager
 			if (startDate != null && !startDate.trim().isEmpty())
 				obj.setStart(new DateTime(formatter.parseDateTime(startDate)));
 			obj.setPlanned("Planned".equals(bean.get("status")));
+
+			obj.setParentType(bean.get("parent_type"));
+			obj.setParentId(bean.get("parent_id"));
+
+			obj.setExtendedTitle(createExtendedTitle(obj.getParentType(), obj.getParentId()));
 		}
 	};
 
@@ -379,7 +391,8 @@ public class CrmManager
 
 		return new ArrayList<>(collection);
 	}
-	
+
+
 	public static List<Task> getTaskListByParent(String parentId)
 	{
 		String moduleName = "Tasks";
@@ -866,6 +879,8 @@ public class CrmManager
 	{
 		return sugarUrl + "/index.php?action=DetailView&module=" + moduleName + "&record=" + id;
 	}
+
+
 	public static String createObjectEditUrl(String moduleName, String id)
 	{
 		return sugarUrl + "/index.php?action=EditView&module=" + moduleName + "&record=" + id;
@@ -1007,13 +1022,13 @@ public class CrmManager
 					return -1;
 				if (!o1.isPlanned() && o2.isPlanned())
 					return 1;
-				
+
 				if (o1.getStart() != null && o2.getStart() != null)
 					ret = o1.getStart().compareTo(o2.getStart());
 
 				if (!o1.isPlanned())
-					ret = ret*-1;
-				
+					ret = ret * -1;
+
 				if (ret != 0)
 					return ret;
 
