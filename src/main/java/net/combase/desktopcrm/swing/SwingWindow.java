@@ -177,7 +177,7 @@ public class SwingWindow
 			@Override
 			public void initiateDataSelection()
 			{
-				tabbedPane.setSelectedIndex(4);
+				tabbedPane.setSelectedIndex(5);
 				frame.setVisible(true);
 				frame.setState(Frame.NORMAL);
 				frame.setAlwaysOnTop(true);
