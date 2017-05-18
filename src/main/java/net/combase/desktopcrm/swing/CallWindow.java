@@ -31,6 +31,15 @@ import com.google.common.collect.Lists;
 
 import ch.swingfx.twinkle.NotificationBuilder;
 import ch.swingfx.twinkle.window.Positions;
+import javafx.application.Platform;
+import javafx.collections.ObservableList;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 import net.combase.desktopcrm.data.CrmManager;
 import net.combase.desktopcrm.domain.AbstractCrmObject;
 import net.combase.desktopcrm.domain.Call;
@@ -43,7 +52,8 @@ import net.combase.desktopcrm.swing.DataSelectionEventManager.DataSelectionListe
 
 
 /**
- * TODO: create task from call use URL crm/index.php?module=Tasks&action=EditView&record=4fc558fb-1303-f533-cdda-57913ac416e9
+ * TODO: create task from call use URL
+ * crm/index.php?module=Tasks&action=EditView&record=4fc558fb-1303-f533-cdda-57913ac416e9
  * 
  * @author "Till Freier"
  */
@@ -62,17 +72,27 @@ public class CallWindow extends JFrame
 	private JTextArea text;
 
 	private final CallType type;
-	
+
 	private TaskTablePanel taskPanel;
+
+	private JPanel activitySummary;
+
+	private WebView browser;
+
+	private JLabel label;
 
 
 	public CallWindow(String number, CallType type)
 	{
 		super();
 		this.type = type;
-		setIconImage(CrmIcons.CALL.getImage());
+		init(number);
+	}
 
-		setContact(number);
+
+	private void init(String number)
+	{
+		setIconImage(CrmIcons.CALL.getImage());
 
 		JPanel main = new JPanel();
 		main.setLayout(new BorderLayout());
@@ -86,7 +106,7 @@ public class CallWindow extends JFrame
 		JPanel top = new JPanel();
 		top.setLayout(new FlowLayout());
 
-		final JLabel label = new JLabel(contact != null ? contact.getTitle() : number);
+		label = new JLabel(number);
 		top.add(label);
 		final JButton select = new JButton("");
 		select.setIcon(CrmIcons.SETTINGS);
@@ -134,7 +154,7 @@ public class CallWindow extends JFrame
 				}
 				else
 					DesktopUtil.openBrowser(contact.getViewUrl());
-				
+
 			}
 		});
 		top.add(view);
@@ -204,21 +224,33 @@ public class CallWindow extends JFrame
 				}
 			}
 		});
-		
+
 		taskPanel = new TaskTablePanel(new ArrayList<Task>(0));
-		
+
 		final JPanel mainTask = new JPanel();
 		mainTask.setLayout(new BorderLayout());
 		mainTask.add(taskPanel, BorderLayout.CENTER);
-		
-		
+
+		activitySummary = new JPanel();
+		activitySummary.setLayout(new BorderLayout());
+
+		new JFXPanel();
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run()
+			{
+				initBrowser();
+			}
+		});
+
 		final JTabbedPane tabbedPane = new JTabbedPane();
 
 		tabbedPane.addTab("Call Info", CrmIcons.CALL, main);
 		tabbedPane.addTab("Related Tasks", CrmIcons.DONE, mainTask);
+		tabbedPane.addTab("Activities", CrmIcons.TALK, activitySummary);
 
 		getContentPane().add(tabbedPane);
-		setSize(500, 400);
+		setSize(640, 480);
 		setVisible(true);
 
 		setState(Frame.NORMAL);
@@ -229,6 +261,34 @@ public class CallWindow extends JFrame
 		text.requestFocus();
 		text.requestFocusInWindow();
 		text.setCaretPosition(0);
+
+		setContact(number);
+	}
+
+
+	void initBrowser()
+	{
+		Stage stage = new Stage();
+
+		stage.setTitle("Hello Java FX");
+		stage.setResizable(true);
+
+		Group root = new Group();
+		Scene scene = new Scene(root, 1, 1);
+		stage.setScene(scene);
+
+		// Set up the embedded browser:
+		browser = new WebView();
+		browser.setPrefSize(630, 435);
+		ObservableList<Node> children = root.getChildren();
+		children.add(browser);
+
+		JFXPanel jfxPanel = new JFXPanel();
+		jfxPanel.setScene(scene);
+
+		activitySummary.add(jfxPanel, BorderLayout.CENTER);
+		activitySummary.revalidate();
+
 	}
 
 
@@ -285,9 +345,9 @@ public class CallWindow extends JFrame
 			setTitle("Call with " + contact.getTitle());
 		else
 			setTitle("Call with " + number);
-		
+
 		SwingUtilities.invokeLater(new Runnable() {
-			
+
 			@Override
 			public void run()
 			{
@@ -295,7 +355,18 @@ public class CallWindow extends JFrame
 					return;
 				final List<Task> tasks = CrmManager.getTaskListByParent(contact.getId());
 				taskPanel.updateTaskList(Lists.reverse(tasks));
-				
+				label.setText(contact.getTitle());
+
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run()
+					{
+						WebEngine engine = browser.getEngine();
+						engine.load(contact.getActivitiesUrl());
+
+					}
+				});
+
 				text.requestFocus();
 			}
 		});

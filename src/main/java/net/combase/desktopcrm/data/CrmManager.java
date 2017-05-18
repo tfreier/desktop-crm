@@ -3,6 +3,12 @@
  */
 package net.combase.desktopcrm.data;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+import java.net.CookieStore;
+import java.net.HttpCookie;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -323,6 +329,15 @@ public class CrmManager
 		{
 			session = api.getSugarSession(new SugarCredentials(settings.getUser(), settings.getPassword()));
 
+			String sessionId = session.getSessionID();
+			
+			CookieManager manager = new CookieManager();
+		    manager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+		    CookieStore store = manager.getCookieStore();
+		    store.add(new URI(sugarUrl), new HttpCookie("PHPSESSID", sessionId));
+		    CookieHandler.setDefault(manager);
+		    
+			
 			return true;
 		}
 		catch (Exception e)
@@ -864,6 +879,7 @@ public class CrmManager
 		final T t = creator.createObject(id, entity.get("name"));
 		t.setViewUrl(createObjectUrl(moduleName, id));
 		t.setEditUrl(createObjectEditUrl(moduleName, id));
+		t.setActivitiesUrl(createObjectActivitiesUrl(moduleName, id));
 		t.setAssignedUser(entity.get("assigned_user_name"));
 		creator.prepare(t, entity);
 		return t;
@@ -884,6 +900,11 @@ public class CrmManager
 	public static String createObjectEditUrl(String moduleName, String id)
 	{
 		return sugarUrl + "/index.php?action=EditView&module=" + moduleName + "&record=" + id;
+	}
+
+	public static String createObjectActivitiesUrl(String moduleName, String id)
+	{
+		return sugarUrl + "/index.php?module=Activities&action=Popup&query=true&record="+id+"&module_name="+moduleName+"&mode=single&create=false";
 	}
 
 
