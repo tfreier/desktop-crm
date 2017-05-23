@@ -65,7 +65,7 @@ public class CrmManager
 	private static String createExtendedTitle(String type, String id)
 	{
 		String result = "";
-		if (type != null && id != null)
+		if (type != null && id != null && !id.isEmpty())
 			switch (type)
 			{
 				case "Cases":
@@ -86,6 +86,10 @@ public class CrmManager
 						result = contact.getFirstname() + " " + contact.getLastName();
 					break;
 				case "Accounts":
+					Account acc = CrmManager.getAccount(id);
+					if (acc != null)
+						result = acc.getTitle();
+					break;
 				case "Prospects":
 					break;
 				case "Opportunities":
@@ -126,7 +130,15 @@ public class CrmManager
 			obj.setParentType(bean.get("parent_type"));
 			obj.setParentId(bean.get("parent_id"));
 
-			obj.setExtendedTitle(createExtendedTitle(obj.getParentType(), obj.getParentId()));
+			obj.setContactId(bean.get("contact_id"));
+			
+			String extTitle = createExtendedTitle(obj.getParentType(), obj.getParentId());
+			
+			String cname = bean.get("contact_name");
+			if (cname != null && !cname.isEmpty())
+				extTitle += ", "+cname;
+			
+			obj.setExtendedTitle(extTitle);
 			obj.setStatus(bean.get("status"));
 		}
 
@@ -167,6 +179,7 @@ public class CrmManager
 
 			obj.setParentType(bean.get("parent_type"));
 			obj.setParentId(bean.get("parent_id"));
+			obj.setContactId(bean.get("contact_id"));
 
 			obj.setExtendedTitle(createExtendedTitle(obj.getParentType(), obj.getParentId()));
 		}
@@ -959,6 +972,9 @@ public class CrmManager
 
 			String id = api.setBean(session, bean);
 			api.setRelationsship(session, c.getRelatedObjectType(), c.getRelatedObjectId(), "calls", id, false);
+			if (c.getContactId() != null)
+				api.setRelationsship(session, "Contacts", c.getContactId(), "calls", id, false);
+				
 		}
 		catch (Exception e)
 		{
@@ -1129,6 +1145,11 @@ public class CrmManager
 	public static Contact getContact(String id)
 	{
 		return loadCrmObject(id, "Contacts", CONTACT_CREATOR);
+	}
+
+	public static Account getAccount(String id)
+	{
+		return loadCrmObject(id, "Accounts", ACCOUNT_CREATOR);
 	}
 
 

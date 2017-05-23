@@ -47,8 +47,8 @@ public class TaskTableModel extends AbstractTableModel
 		NEXT_WEEK("Next Week");
 
 		private final String label;
-		
-		
+
+
 		/**
 		 * @param label
 		 */
@@ -58,7 +58,8 @@ public class TaskTableModel extends AbstractTableModel
 		}
 
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * @see java.lang.Enum#toString()
 		 */
 		@Override
@@ -66,8 +67,7 @@ public class TaskTableModel extends AbstractTableModel
 		{
 			return label;
 		}
-		
-		
+
 	}
 
 
@@ -162,7 +162,7 @@ public class TaskTableModel extends AbstractTableModel
 		switch (columnIndex)
 		{
 			case 0:
-				return task.getTitle() + " [" + task.getExtendedTitle()+"]";
+				return task.getTitle() + " [" + task.getExtendedTitle() + "]";
 			case 1:
 				if (task.getDue() == null)
 					return "";
@@ -206,7 +206,7 @@ public class TaskTableModel extends AbstractTableModel
 		});
 
 		button.setIcon(CrmIcons.DONE);
-		
+
 		boolean completed = "completed".equals(task.getStatus().toLowerCase());
 		if (task.getDue() != null && task.getDue().isBeforeNow() && !completed)
 			button.setBackground(new Color(255, 0, 0, ALPHA));
@@ -218,7 +218,7 @@ public class TaskTableModel extends AbstractTableModel
 		{
 			button.setToolTipText("Task is already completed");
 			button.setEnabled(false);
-			
+
 		}
 		else
 			button.setToolTipText("Mark as done...");
@@ -301,6 +301,7 @@ public class TaskTableModel extends AbstractTableModel
 		return button;
 	}
 
+
 	private JButton createEditButton(final Task task)
 	{
 		final JButton button = new JButton();
@@ -359,7 +360,7 @@ public class TaskTableModel extends AbstractTableModel
 			button.setVisible(false);
 			button.setEnabled(false);
 		}
-		
+
 		button.setToolTipText("View " + task.getExtendedTitle());
 
 		return button;
@@ -375,31 +376,39 @@ public class TaskTableModel extends AbstractTableModel
 			{
 				String name = "";
 				String no = null;
-				switch (task.getParentType())
+
+				if (task.getContactId() != null)
 				{
-					case "Leads":
-						Lead lead = CrmManager.getLead(task.getParentId());
-						if (lead == null)
-							break;
-						name = lead.getTitle();
-						no = lead.getPhone();
-					case "Contacts":
-						Contact c = CrmManager.getContact(task.getParentId());
-						if (c == null)
-							break;
-						name = c.getTitle();
-						no = c.getPhone();
-					case "Opportunities":
-						Collection<Contact> contacts = CrmManager.getContactListByOpportunity(task.getParentId());
-						if (contacts != null && !contacts.isEmpty())
-						{
-							Contact next = contacts.iterator().next();
-							name = next.getTitle();
-							no = next.getPhone();
-						}
-					default:
-						break;
+					Contact contact = CrmManager.getContact(task.getContactId());
+					no = contact.getPhone();
+					name = contact.getTitle();
 				}
+				if (no == null || no.isEmpty())
+					switch (task.getParentType())
+					{
+						case "Leads":
+							Lead lead = CrmManager.getLead(task.getParentId());
+							if (lead == null)
+								break;
+							name = lead.getTitle();
+							no = lead.getPhone();
+						case "Contacts":
+							Contact c = CrmManager.getContact(task.getParentId());
+							if (c == null)
+								break;
+							name = c.getTitle();
+							no = c.getPhone();
+						case "Opportunities":
+							Collection<Contact> contacts = CrmManager.getContactListByOpportunity(task.getParentId());
+							if (contacts != null && !contacts.isEmpty())
+							{
+								Contact next = contacts.iterator().next();
+								name = next.getTitle();
+								no = next.getPhone();
+							}
+						default:
+							break;
+					}
 				if (no == null || no.trim().isEmpty())
 					JOptionPane.showMessageDialog(null, "No number found for " + name);
 
@@ -417,7 +426,7 @@ public class TaskTableModel extends AbstractTableModel
 			button.setEnabled(false);
 		}
 
-		button.setToolTipText("Call "+task.getExtendedTitle());
+		button.setToolTipText("Call " + task.getExtendedTitle());
 
 		return button;
 	}

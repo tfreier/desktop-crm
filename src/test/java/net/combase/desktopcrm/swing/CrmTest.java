@@ -3,17 +3,14 @@
  */
 package net.combase.desktopcrm.swing;
 
-import java.io.IOException;
+import java.util.Collection;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.joda.time.DateTime;
+
+import net.combase.desktopcrm.data.CrmManager;
+import net.combase.desktopcrm.domain.Call;
+import net.combase.desktopcrm.domain.CallType;
+import net.combase.desktopcrm.domain.Contact;
 
 /**
  * @author "Till Freier"
@@ -23,27 +20,25 @@ public class CrmTest
 {
 	public static void main(String[] args)
 	{
+		
+		CrmManager.setup();
+		
+		Collection<Contact> findContacts = CrmManager.findContacts("Till");
+		
+		Call c = new Call();
+		c.setStart(new DateTime());
+		if (findContacts != null && !findContacts.isEmpty())
+		{
+			Contact contact = findContacts.iterator().next();
+			c.setRelatedObjectId(contact.getAccountId());
+			c.setRelatedObjectType("Accounts");
+			c.setContactId(contact.getId());
+			
+		}
+		c.setTitle("Test Call");
+		c.setDescription("just a test");
+		c.setType(CallType.OUTBOUND);
 
-		try
-		{
-			HttpGet get = new HttpGet("http://10.1.0.11/cgi-bin/ConfigManApp.com?number=123-456-7890");
-			CredentialsProvider provider = new BasicCredentialsProvider();
-			UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("admin", "admin");
-			provider.setCredentials(AuthScope.ANY, credentials);
-			HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-
-			HttpResponse response = client.execute(get);
-			int statusCode = response.getStatusLine().getStatusCode();
-		}
-		catch (ClientProtocolException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		CrmManager.createCall(c);
 	}
 }

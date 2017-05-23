@@ -26,7 +26,8 @@ public class Task extends AbstractCrmObject
 	
 	private String status;
 	
-	
+	private String contactId;
+
 	
 	
 	
@@ -127,5 +128,15 @@ public class Task extends AbstractCrmObject
 	public String getCrmEntityType()
 	{
 		return "Tasks";
+	}
+
+	public String getContactId()
+	{
+		return contactId;
+	}
+
+	public void setContactId(String contactId)
+	{
+		this.contactId = contactId;
 	}
 }

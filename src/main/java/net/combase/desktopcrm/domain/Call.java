@@ -25,8 +25,29 @@ public class Call extends AbstractCrmObject
 	private String parentId;
 	
 	private String extendedTitle;
+	
+	private String contactId;
 
 	
+	
+
+	/**
+	 * @return the contactId
+	 */
+	public String getContactId()
+	{
+		return contactId;
+	}
+
+
+	/**
+	 * @param contactId the contactId to set
+	 */
+	public void setContactId(String contactId)
+	{
+		this.contactId = contactId;
+	}
+
 
 	/**
 	 * @return the extendedTitle

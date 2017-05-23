@@ -65,7 +65,8 @@ public class CallWindow extends JFrame
 	 */
 	private static final long serialVersionUID = -601570990578198225L;
 
-	private AbstractCrmObject contact;
+	private AbstractCrmObject relatedObject;
+	private Contact contact;
 
 	private DateTime start = new DateTime();
 
@@ -77,6 +78,7 @@ public class CallWindow extends JFrame
 
 	private JPanel activitySummary;
 
+	@SuppressWarnings("restriction")
 	private WebView browser;
 
 	private JLabel label;
@@ -90,6 +92,7 @@ public class CallWindow extends JFrame
 	}
 
 
+	@SuppressWarnings("restriction")
 	private void init(String number)
 	{
 		setIconImage(CrmIcons.CALL.getImage());
@@ -120,7 +123,7 @@ public class CallWindow extends JFrame
 					@Override
 					public void dataSelected(AbstractCrmObject data)
 					{
-						contact = data;
+						relatedObject = data;
 						label.setText(data.getClass().getSimpleName() + ": " + data.getTitle());
 						select.setEnabled(true);
 
@@ -141,7 +144,7 @@ public class CallWindow extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				if (contact == null)
+				if (relatedObject == null)
 				{
 					NotificationBuilder nb = DesktopUtil.createNotificationBuilder();
 					nb.withTitle("No contact found");
@@ -153,7 +156,7 @@ public class CallWindow extends JFrame
 					nb.showNotification();
 				}
 				else
-					DesktopUtil.openBrowser(contact.getViewUrl());
+					DesktopUtil.openBrowser(relatedObject.getViewUrl());
 
 			}
 		});
@@ -266,6 +269,7 @@ public class CallWindow extends JFrame
 	}
 
 
+	@SuppressWarnings("restriction")
 	void initBrowser()
 	{
 		Stage stage = new Stage();
@@ -296,11 +300,15 @@ public class CallWindow extends JFrame
 	{
 		Call c = new Call();
 		c.setStart(start);
-		if (contact != null)
+		if (relatedObject != null)
 		{
-			c.setRelatedObjectId(contact.getId());
-			c.setRelatedObjectType(contact.getCrmEntityType());
+			c.setRelatedObjectId(relatedObject.getId());
+			c.setRelatedObjectType(relatedObject.getCrmEntityType());
 		}
+		
+		if (contact != null)
+			c.setContactId(contact.getId());
+		
 		String desc = text.getText();
 		String title = ": ";
 		if (desc != null && desc.length() > 3)
@@ -319,50 +327,61 @@ public class CallWindow extends JFrame
 	 */
 	private void setContact(String number)
 	{
-		contact = CrmManager.getContactByNumber(number);
-		if (contact != null)
+		relatedObject = CrmManager.getContactByNumber(number);
+		if (relatedObject != null)
 		{
 			setIconImage(CrmIcons.USER.getImage());
-			final String accountId = ((Contact) contact).getAccountId();
+			Contact c = (Contact) relatedObject;
+			final String accountId = c.getAccountId();
 			if (accountId != null && !accountId.isEmpty())
 			{
 				Collection<Opportunity> list = CrmManager.getOpportunityListByAccount(accountId);
+				if (!list.isEmpty())
+				{
 				for (Opportunity opportunity : list)
 				{
-					contact = opportunity;
+					relatedObject = opportunity;
 					setIconImage(CrmIcons.BELL.getImage());
 				}
+				}
+				else
+				{
+					relatedObject = CrmManager.getAccount(accountId);
+					contact = c;
+				}
 			}
-
+			else
+				relatedObject = c;
 		}
 		else
 		{
-			contact = CrmManager.getLeadByNumber(number);
+			relatedObject = CrmManager.getLeadByNumber(number);
 			setIconImage(CrmIcons.USER.getImage());
 		}
 
-		if (contact != null)
-			setTitle("Call with " + contact.getTitle());
+		if (relatedObject != null)
+			setTitle("Call with " + relatedObject.getTitle());
 		else
 			setTitle("Call with " + number);
 
 		SwingUtilities.invokeLater(new Runnable() {
 
+			@SuppressWarnings("restriction")
 			@Override
 			public void run()
 			{
-				if (contact == null)
+				if (relatedObject == null)
 					return;
-				final List<Task> tasks = CrmManager.getTaskListByParent(contact.getId());
+				final List<Task> tasks = CrmManager.getTaskListByParent(relatedObject.getId());
 				taskPanel.updateTaskList(Lists.reverse(tasks));
-				label.setText(contact.getTitle());
+				label.setText(relatedObject.getTitle());
 
 				Platform.runLater(new Runnable() {
 					@Override
 					public void run()
 					{
 						WebEngine engine = browser.getEngine();
-						engine.load(contact.getActivitiesUrl());
+						engine.load(relatedObject.getActivitiesUrl());
 
 					}
 				});
