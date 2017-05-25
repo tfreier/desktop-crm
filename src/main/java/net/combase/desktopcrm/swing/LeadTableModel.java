@@ -69,7 +69,7 @@ public class LeadTableModel extends AbstractTableModel
 		switch (columnIndex)
 		{
 			case 0 :
-				return task.getTitle();
+				return task.getTitle() + " ["+task.getAccountName()+"]";
 			case 1 :
 				return createViewButton(task);
 			case 2 :
