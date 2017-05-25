@@ -377,11 +377,14 @@ public class TaskTableModel extends AbstractTableModel
 				String name = "";
 				String no = null;
 
-				if (task.getContactId() != null)
+				if (task.getContactId() != null && !task.getContactId().isEmpty())
 				{
 					Contact contact = CrmManager.getContact(task.getContactId());
-					no = contact.getPhone();
-					name = contact.getTitle();
+					if (contact != null)
+					{
+						no = contact.getPhone();
+						name = contact.getTitle();
+					}
 				}
 				if (no == null || no.isEmpty())
 					switch (task.getParentType())
