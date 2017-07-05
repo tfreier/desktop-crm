@@ -150,9 +150,11 @@ public class LeadImporter
 							}
 							break;
 						case "First Name":
+						case "First name":
 							lead.setFirstname(value);
 							break;
 						case "Last Name":
+						case "Last name":
 							lead.setLastName(value);
 							break;
 						case "Job Title":
@@ -160,8 +162,13 @@ public class LeadImporter
 							lead.setJobTitle(value);
 							break;
 						case "Phone":
+						case "Phone number":
 							lead.setPhone(value);
 							break;
+						case "Work Email": //this is typical for linkedin leads
+							camp = CrmManager.getCampaignByName("LinkedIn");
+							if (camp != null)
+								lead.setCampaignId(camp.getId());
 						case "Email":
 							lead.setEmail(value);
 							break;
