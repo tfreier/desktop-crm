@@ -23,6 +23,7 @@ This project provides a simple desktop application to make working with your CRM
 - Asterik Call Logging
 - Search (Leads,Contacts)
 - CSV Lead import via Drag&Drop
+- Quick task and activity overview for calls
 
 ## Planned Features
 
