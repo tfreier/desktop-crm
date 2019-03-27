@@ -33,7 +33,7 @@ import net.combase.desktopcrm.domain.Settings;
 
 /**
  * yealink call url:
- * http://10.1.0.11/cgi-bin/ConfigManApp.com?number=702-927-6689
+ * http://10.1.0.11/cgi-bin/ConfigManApp.com?number=
  * 
  * @author "Till Freier"
  */
